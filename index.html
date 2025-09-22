@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Новости Нью-Йорк Таймс</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #2c3e50; }
+    button { margin: 5px; padding: 10px; cursor: pointer; }
+    #article { margin-top: 20px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Новости Нью-Йорк Таймс</h1>
+  <p>Выберите статью:</p>
+  <button onclick="getArticle(1)">Статья 1</button>
+  <button onclick="getArticle(2)">Статья 2</button>
+  <button onclick="getArticle(3)">Статья 3</button>
+  <div id="article"></div>
+
+  <script>
+    async function getArticle(id) {
+      const res = await fetch(`https://YOUR-SERVER-URL/get_article?id=${id}`);
+      const data = await res.json();
+      document.getElementById("article").innerText = data.text || "Ошибка загрузки статьи.";
+    }
+  </script>
+</body>
+</html>
