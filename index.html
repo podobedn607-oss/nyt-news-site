@@ -1,84 +1,196 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Новости New York Times + GPT</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-        h1 { color: #2c3e50; }
-        .article { background: white; padding: 15px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        button { margin-top: 10px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: none; border-radius: 5px; background: #3498db; color: white; }
-        button:hover { background: #2980b9; }
-        #articleText, #gptAnswer { margin-top: 20px; white-space: pre-wrap; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #gptAnswer { background: #ecf0f1; }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NYT → GPT — Новости и перевод</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --accent:#ff6b6b;
+    --muted:#94a3b8;
+    --glass: rgba(255,255,255,0.04);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:
+    linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);color:#e6eef6}
+  .container{max-width:1100px;margin:24px auto;padding:24px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  header h1{margin:0;font-size:1.6rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow: 0 8px 30px rgba(2,8,23,0.6);border:1px solid rgba(255,255,255,0.03);}
+  .thumb{height:160px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px}
+  .title{font-weight:600;margin:0 0 8px 0}
+  .meta{font-size:0.85rem;color:var(--muted);margin-bottom:10px}
+  .btns{display:flex;gap:8px}
+  .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
+  .btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
+  #articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap}
+  footer{margin-top:20px;color:var(--muted);font-size:0.9rem}
+  .top-controls{display:flex;gap:10px;align-items:center}
+  input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+  .loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero{display:flex;gap:16px;align-items:center}
+  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+  .big{font-size:1rem;color:#fff;opacity:0.95}
+</style>
 </head>
 <body>
-    <h1>Новости New York Times</h1>
-    <p>Нажмите на статью, чтобы посмотреть текст и спросить GPT:</p>
-
-    <div class="article">
-        <h2>Статья 1: США и мир</h2>
-        <button onclick="showArticle(1)">Читать</button>
+<div class="container">
+  <header>
+    <div class="hero">
+      <div class="logo">NYT</div>
+      <div>
+        <h1>NYT → GPT: последние статьи</h1>
+        <div style="color:var(--muted)">Просматривай последние статьи NYT и переводь/объясняй их с помощью GPT</div>
+      </div>
     </div>
-
-    <div class="article">
-        <h2>Статья 2: Европа</h2>
-        <button onclick="showArticle(2)">Читать</button>
+    <div style="flex:1"></div>
+    <div class="top-controls">
+      <input id="q" type="search" placeholder="Поиск по заголовкам..." />
+      <button id="reload" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06)">Обновить</button>
     </div>
+  </header>
 
-    <div class="article">
-        <h2>Статья 3: Азия</h2>
-        <button onclick="showArticle(3)">Читать</button>
+  <section id="list" class="grid"></section>
+
+  <div id="articleView"></div>
+
+  <footer>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>Сайт: GitHub Pages + Backend: FastAPI</div>
+      <div>Нажми «Отправить боту», чтобы бот прислал перевод в чат Telegram</div>
     </div>
+  </footer>
+</div>
 
-    <div id="articleText"></div>
-    <button id="askGPT" style="display:none;" onclick="askGPT()">Спросить GPT</button>
-    <div id="gptAnswer"></div>
+<script>
+  const SERVER = "http://0.0.0.0:8000"; // <-- сюда URL твоего backend (Render/Railway) или http://localhost:8000 при локальном тесте
+  const listEl = document.getElementById("list");
+  const articleView = document.getElementById("articleView");
+  const q = document.getElementById("q");
+  const reload = document.getElementById("reload");
 
-    <script>
-        let currentText = "";
+  async function fetchLatest(){
+    listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center"><span class="loader"></span> Загрузка...</div>';
+    try{
+      const res = await fetch(`${SERVER}/latest?count=30`);
+      const data = await res.json();
+      renderList(data.items || []);
+    }catch(e){
+      listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: '+e.message+'</div>';
+    }
+  }
 
-        function showArticle(id) {
-            const articles = {
-                1: "Полный текст статьи про США и мир...",
-                2: "Полный текст статьи про 3Европу...",
-                3: "Полный текст статьи про Азию..."
-            };
-            currentText = articles[id];
-            document.getElementById("articleText").innerText = currentText;
-            document.getElementById("askGPT").style.display = "block";
-            document.getElementById("gptAnswer").innerText = "";
-        }
+  function renderList(items){
+    if(!items || items.length===0){
+      listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted)">Статей не найдено</div>';
+      return;
+    }
+    listEl.innerHTML = "";
+    items.forEach((it, idx) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const imgUrl = it.image || `https://source.unsplash.com/collection/928423/800x600?sig=${idx}`; // запасной фон
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      thumb.style.backgroundImage = `url('${imgUrl}')`;
+      const title = document.createElement("h3");
+      title.className = "title";
+      title.innerText = it.title;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerText = it.published ? it.published : it.link;
+      const summary = document.createElement("div");
+      summary.style.marginBottom = "10px";
+      summary.style.color = "var(--muted)";
+      summary.innerHTML = it.summary ? it.summary : "";
 
-        async function askGPT() {
-            const apiKey = "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"; // ⚠️ сюда твой ключ
-            const prompt = `Переведи и объясни на русском следующий текст статьи:\n\n${currentText}`;
+      const btns = document.createElement("div");
+      btns.className = "btns";
+      const readBtn = document.createElement("button");
+      readBtn.className = "btn read";
+      readBtn.innerText = "Читать & Перевести";
+      readBtn.onclick = () => loadArticle(it.link);
+      const sendBtn = document.createElement("button");
+      sendBtn.className = "btn send";
+      sendBtn.innerText = "Отправить боту";
+      sendBtn.onclick = () => sendToBot(it.link);
 
-            try {
-                const response = await fetch("https://api.openai.com/v1/responses", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-4o-mini",
-                        input: prompt
-                    })
-                });
+      btns.appendChild(readBtn); btns.appendChild(sendBtn);
+      card.appendChild(thumb);
+      card.appendChild(title);
+      card.appendChild(meta);
+      card.appendChild(summary);
+      card.appendChild(btns);
+      listEl.appendChild(card);
+    });
+  }
 
-                const data = await response.json();
-                if (data.output && data.output[0] && data.output[0].content) {
-                    document.getElementById("gptAnswer").innerText = data.output[0].content[0].text;
-                } else {
-                    document.getElementById("gptAnswer").innerText = "Ошибка: не удалось получить ответ GPT.";
-                }
-            } catch (err) {
-                document.getElementById("gptAnswer").innerText = "Ошибка запроса: " + err;
-            }
-        }
-    </script>
+  async function loadArticle(url){
+    articleView.innerHTML = "<div style='text-align:center'><span class='loader'></span> Получаем статью...</div>";
+    try{
+      const res = await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
+      const json = await res.json();
+      if(json.error){
+        articleView.innerHTML = `<div style="color:#ff8b8b">${json.error}</div>`;
+        return;
+      }
+      const html = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">${json.link}</div>
+          <div>
+            <button class="btn send" onclick="sendToBot('${json.link.replaceAll("'", "\\'")}')">Отправить боту</button>
+          </div>
+        </div>
+        <h2 style="margin-top:12px;margin-bottom:8px">${json.title || ""}</h2>
+        <div style="color:var(--muted);margin-bottom:12px">Исходный текст:</div>
+        <div style="background:#081226;padding:12px;border-radius:8px;color:#dbeafe;max-height:380px;overflow:auto">${escapeHtml(json.text || "").replace(/\n/g,'<br>')}</div>
+        <div style="height:12px"></div>
+        <div style="color:var(--muted);margin-bottom:8px">Перевод (GPT):</div>
+        <div style="background:#021826;padding:12px;border-radius:8px;color:#dff6ea;white-space:pre-wrap">${escapeHtml(json.translation || "").replace(/\n/g,'<br>')}</div>
+      `;
+      articleView.innerHTML = html;
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    }catch(e){
+      articleView.innerHTML = `<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;
+    }
+  }
+
+  function escapeHtml(unsafe) {
+    if(!unsafe) return "";
+    return unsafe.replace(/[&<"'>]/g, function(m) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];
+    });
+  }
+
+  // отправка ссылки боту через Telegram WebApp
+  function sendToBot(url){
+    if(window.Telegram && window.Telegram.WebApp){
+      window.Telegram.WebApp.sendData(url);
+      alert("Ссылка отправлена боту");
+    }else{
+      // для теста: покажем ссылку
+      navigator.clipboard.writeText(url);
+      alert("Telegram WebApp недоступен в этом браузере. Ссылка скопирована в буфер.");
+    }
+  }
+
+  reload.onclick = () => fetchLatest();
+  q.oninput = () => {
+    const term = q.value.trim().toLowerCase();
+    const cards = document.querySelectorAll(".card");
+    cards.forEach(c=>{
+      const t = c.querySelector(".title").innerText.toLowerCase();
+      c.style.display = t.includes(term) ? "" : "none";
+    });
+  }
+
+  // старт
+  fetchLatest();
+</script>
 </body>
 </html>
