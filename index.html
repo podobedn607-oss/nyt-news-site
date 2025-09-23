@@ -35,7 +35,6 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .hero{display:flex;gap:16px;align-items:center}
   .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-  .big{font-size:1rem;color:#fff;opacity:0.95}
 </style>
 </head>
 <body>
@@ -56,19 +55,20 @@
   </header>
 
   <section id="list" class="grid"></section>
-
   <div id="articleView"></div>
 
   <footer>
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div>Сайт: GitHub Pages + Backend: FastAPI</div>
-      <div>Нажми «Отправить боту», чтобы бот прислал перевод в чат Telegram</div>
+      <div>Нажми «Отправить боту», чтобы бот прислал перевод в Telegram</div>
     </div>
   </footer>
 </div>
 
 <script>
-  const SERVER = "http://0.0.0.0:8000"; // <-- сюда URL твоего backend (Render/Railway) или http://localhost:8000 при локальном тесте
+  // Автоопределение URL бэкенда: текущий домен + порт
+  const SERVER = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}`;
+
   const listEl = document.getElementById("list");
   const articleView = document.getElementById("articleView");
   const q = document.getElementById("q");
@@ -81,7 +81,7 @@
       const data = await res.json();
       renderList(data.items || []);
     }catch(e){
-      listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: '+e.message+'</div>';
+      listEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: ${e.message}</div>`;
     }
   }
 
@@ -94,7 +94,7 @@
     items.forEach((it, idx) => {
       const card = document.createElement("div");
       card.className = "card";
-      const imgUrl = it.image || `https://source.unsplash.com/collection/928423/800x600?sig=${idx}`; // запасной фон
+      const imgUrl = it.image || `https://source.unsplash.com/collection/928423/800x600?sig=${idx}`;
       const thumb = document.createElement("div");
       thumb.className = "thumb";
       thumb.style.backgroundImage = `url('${imgUrl}')`;
@@ -103,11 +103,11 @@
       title.innerText = it.title;
       const meta = document.createElement("div");
       meta.className = "meta";
-      meta.innerText = it.published ? it.published : it.link;
+      meta.innerText = it.published || it.link;
       const summary = document.createElement("div");
       summary.style.marginBottom = "10px";
       summary.style.color = "var(--muted)";
-      summary.innerHTML = it.summary ? it.summary : "";
+      summary.innerHTML = it.summary || "";
 
       const btns = document.createElement("div");
       btns.className = "btns";
@@ -162,28 +162,23 @@
 
   function escapeHtml(unsafe) {
     if(!unsafe) return "";
-    return unsafe.replace(/[&<"'>]/g, function(m) {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];
-    });
+    return unsafe.replace(/[&<"'>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   }
 
-  // отправка ссылки боту через Telegram WebApp
   function sendToBot(url){
     if(window.Telegram && window.Telegram.WebApp){
       window.Telegram.WebApp.sendData(url);
       alert("Ссылка отправлена боту");
     }else{
-      // для теста: покажем ссылку
       navigator.clipboard.writeText(url);
-      alert("Telegram WebApp недоступен в этом браузере. Ссылка скопирована в буфер.");
+      alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");
     }
   }
 
   reload.onclick = () => fetchLatest();
   q.oninput = () => {
     const term = q.value.trim().toLowerCase();
-    const cards = document.querySelectorAll(".card");
-    cards.forEach(c=>{
+    document.querySelectorAll(".card").forEach(c=>{
       const t = c.querySelector(".title").innerText.toLowerCase();
       c.style.display = t.includes(term) ? "" : "none";
     });
