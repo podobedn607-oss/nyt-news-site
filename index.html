@@ -6,45 +6,41 @@
 <title>NYT → GPT — Новости и перевод</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0f1724;
-    --card:#0b1220;
-    --accent:#ff6b6b;
-    --muted:#94a3b8;
-    --glass: rgba(255,255,255,0.04);
-  }
-  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:
-    linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);color:#e6eef6;position:relative;}
-  .container{max-width:1100px;margin:24px auto;padding:24px}
-  header{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
-  header h1{margin:0;font-size:1.6rem}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow: 0 8px 30px rgba(2,8,23,0.6);border:1px solid rgba(255,255,255,0.03);}
-  .thumb{height:160px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px}
-  .title{font-weight:600;margin:0 0 8px 0}
-  .meta{font-size:0.85rem;color:var(--muted);margin-bottom:10px}
-  .btns{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-  .btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
-  .btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
-  #articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap}
-  .top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
-  input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
-  .loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .hero{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-  /* автор и техподдержка в левом нижнем углу */
-  .author-label{
-    position:fixed;
-    left:16px;
-    bottom:16px;
-    font-size:0.95rem;
-    color:white;
-    font-weight:500;
-    opacity:0.85;
-    z-index:1000;
-  }
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --accent:#ff6b6b;
+  --muted:#94a3b8;
+  --glass: rgba(255,255,255,0.04);
+}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  background: linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);
+  color:#e6eef6;
+  position:relative;
+}
+.container{max-width:1100px;margin:24px auto;padding:24px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+header h1{margin:0;font-size:1.6rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(2,8,23,0.6);border:1px solid rgba(255,255,255,0.03);}
+.thumb{height:160px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px}
+.title{font-weight:600;margin:0 0 8px 0}
+.meta{font-size:0.85rem;color:var(--muted);margin-bottom:10px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+.btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
+.btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
+#articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap}
+.top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+.loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+.author-label{position:fixed;left:16px;bottom:16px;font-size:0.95rem;color:white;font-weight:500;opacity:0.85;z-index:1000}
 </style>
 </head>
 <body>
@@ -68,11 +64,10 @@
   <div id="articleView"></div>
 </div>
 
-<!-- автор и техподдержка -->
 <div class="author-label">Автор – Nikita Podobed | Техподдержка: +89854449930</div>
 
 <script>
-const SERVER = (window.location.protocol === "file:")
+const SERVER = (window.location.protocol === "file:" || window.location.hostname === "localhost")
     ? "http://localhost:8000"
     : `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}`;
 
@@ -81,12 +76,13 @@ const articleView = document.getElementById("articleView");
 const q = document.getElementById("q");
 const reload = document.getElementById("reload");
 
-let articlesCache = []; // кэш статей
+let articlesCache = [];
 
 async function fetchLatest(){
   listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center"><span class="loader"></span> Загрузка...</div>';
   try{
     const res = await fetch(`${SERVER}/latest?count=50`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     articlesCache = data.items || [];
     renderList(articlesCache);
@@ -101,36 +97,36 @@ function renderList(items){
     return;
   }
   listEl.innerHTML = "";
-  items.forEach((it, idx) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    const imgUrl = it.image || `https://source.unsplash.com/collection/928423/800x600?sig=${idx}`;
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    thumb.style.backgroundImage = `url('${imgUrl}')`;
-    const title = document.createElement("h3");
-    title.className = "title";
-    title.innerText = it.title;
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.innerText = it.published || it.link;
-    const summary = document.createElement("div");
-    summary.style.marginBottom = "10px";
-    summary.style.color = "var(--muted)";
-    summary.innerHTML = it.summary || "";
+  items.forEach((it, idx)=>{
+    const card=document.createElement("div");
+    card.className="card";
+    const imgUrl=it.image||`https://source.unsplash.com/collection/928423/800x600?sig=${idx}`;
+    const thumb=document.createElement("div");
+    thumb.className="thumb";
+    thumb.style.backgroundImage=`url('${imgUrl}')`;
+    const title=document.createElement("h3");
+    title.className="title";
+    title.innerText=it.title;
+    const meta=document.createElement("div");
+    meta.className="meta";
+    meta.innerText=it.published||it.link;
+    const summary=document.createElement("div");
+    summary.style.marginBottom="10px";
+    summary.style.color="var(--muted)";
+    summary.innerHTML=it.summary||"";
 
-    const btns = document.createElement("div");
-    btns.className = "btns";
-    const readBtn = document.createElement("button");
-    readBtn.className = "btn read";
-    readBtn.innerText = "Читать & Перевести";
-    readBtn.onclick = () => loadArticle(it.link);
-    const sendBtn = document.createElement("button");
-    sendBtn.className = "btn send";
-    sendBtn.innerText = "Отправить боту";
-    sendBtn.onclick = () => sendToBot(it.link);
+    const btns=document.createElement("div");
+    btns.className="btns";
+    const readBtn=document.createElement("button");
+    readBtn.className="btn read";
+    readBtn.innerText="Читать & Перевести";
+    readBtn.onclick=()=>loadArticle(it.link);
+    const sendBtn=document.createElement("button");
+    sendBtn.className="btn send";
+    sendBtn.innerText="Отправить боту";
+    sendBtn.onclick=()=>sendToBot(it.link);
+    btns.appendChild(readBtn);btns.appendChild(sendBtn);
 
-    btns.appendChild(readBtn); btns.appendChild(sendBtn);
     card.appendChild(thumb);
     card.appendChild(title);
     card.appendChild(meta);
@@ -140,63 +136,47 @@ function renderList(items){
   });
 }
 
-// поиск по заголовкам
-q.oninput = () => {
-  const term = q.value.trim().toLowerCase();
-  const filtered = articlesCache.filter(a => a.title.toLowerCase().includes(term));
+q.oninput=()=>{
+  const term=q.value.trim().toLowerCase();
+  const filtered=articlesCache.filter(a=>a.title.toLowerCase().includes(term));
   renderList(filtered);
 }
 
-// загрузка статьи и перевода
 async function loadArticle(url){
-  articleView.innerHTML = "<div style='text-align:center'><span class='loader'></span> Получаем статью...</div>";
+  articleView.innerHTML="<div style='text-align:center'><span class='loader'></span> Получаем статью...</div>";
   try{
-    const res = await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
-    const json = await res.json();
+    const res=await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json=await res.json();
     if(json.error){
-      articleView.innerHTML = `<div style="color:#ff8b8b">${json.error}</div>`;
+      articleView.innerHTML=`<div style="color:#ff8b8b">${json.error}</div>`;
       return;
     }
-    const html = `
+    const html=`
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div style="font-weight:700">${json.link}</div>
         <div>
           <button class="btn send" onclick="sendToBot('${json.link.replaceAll("'", "\\'")}')">Отправить боту</button>
         </div>
       </div>
-      <h2 style="margin-top:12px;margin-bottom:8px">${json.title || ""}</h2>
+      <h2 style="margin-top:12px;margin-bottom:8px">${json.title||""}</h2>
       <div style="color:var(--muted);margin-bottom:12px">Исходный текст:</div>
-      <div style="background:#081226;padding:12px;border-radius:8px;color:#dbeafe;max-height:380px;overflow:auto">${escapeHtml(json.text || "").replace(/\n/g,'<br>')}</div>
+      <div style="background:#081226;padding:12px;border-radius:8px;color:#dbeafe;max-height:380px;overflow:auto">${escapeHtml(json.text||"").replace(/\n/g,'<br>')}</div>
       <div style="height:12px"></div>
       <div style="color:var(--muted);margin-bottom:8px">Перевод (GPT):</div>
-      <div style="background:#021826;padding:12px;border-radius:8px;color:#dff6ea;white-space:pre-wrap">${escapeHtml(json.translation || "").replace(/\n/g,'<br>')}</div>
+      <div style="background:#021826;padding:12px;border-radius:8px;color:#dff6ea;white-space:pre-wrap">${escapeHtml(json.translation||"").replace(/\n/g,'<br>')}</div>
     `;
-    articleView.innerHTML = html;
+    articleView.innerHTML=html;
     window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
   }catch(e){
-    articleView.innerHTML = `<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;
+    articleView.innerHTML=`<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;
   }
 }
 
-function escapeHtml(unsafe) {
-  if(!unsafe) return "";
-  return unsafe.replace(/[&<"'>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
+function escapeHtml(unsafe){if(!unsafe)return"";return unsafe.replace(/[&<"'>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function sendToBot(url){if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.sendData(url);alert("Ссылка отправлена боту");}else{navigator.clipboard.writeText(url);alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");}}
 
-function sendToBot(url){
-  if(window.Telegram && window.Telegram.WebApp){
-    window.Telegram.WebApp.sendData(url);
-    alert("Ссылка отправлена боту");
-  } else {
-    navigator.clipboard.writeText(url);
-    alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");
-  }
-}
-
-// кнопка загрузки свежих статей
-reload.onclick = () => fetchLatest();
-
-// старт
+reload.onclick=()=>fetchLatest();
 fetchLatest();
 </script>
 </body>
