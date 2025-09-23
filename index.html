@@ -14,7 +14,7 @@
     --glass: rgba(255,255,255,0.04);
   }
   html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:
-    linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);color:#e6eef6}
+    linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);color:#e6eef6;position:relative;}
   .container{max-width:1100px;margin:24px auto;padding:24px}
   header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
   header h1{margin:0;font-size:1.6rem}
@@ -35,6 +35,17 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .hero{display:flex;gap:16px;align-items:center}
   .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+  /* автор в левом нижнем углу */
+  .author-label{
+    position:fixed;
+    left:16px;
+    bottom:16px;
+    font-size:0.95rem;
+    color:white;
+    font-weight:500;
+    opacity:0.85;
+    z-index:1000;
+  }
 </style>
 </head>
 <body>
@@ -65,12 +76,13 @@
   </footer>
 </div>
 
+<!-- автор -->
+<div class="author-label">Автор – Nikita Podobed</div>
+
 <script>
-  // Автоматический выбор бэкенда:
-  // Локально - http://localhost:8000
-  // На сервере - текущий домен
-  const SERVER = window.location.protocol.startsWith('file')
-      ? 'http://localhost:8000'
+  // Автоопределение бэкенда
+  const SERVER = (window.location.protocol === "file:")
+      ? "http://localhost:8000"
       : `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}`;
 
   const listEl = document.getElementById("list");
@@ -172,24 +184,3 @@
   function sendToBot(url){
     if(window.Telegram && window.Telegram.WebApp){
       window.Telegram.WebApp.sendData(url);
-      alert("Ссылка отправлена боту");
-    }else{
-      navigator.clipboard.writeText(url);
-      alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");
-    }
-  }
-
-  reload.onclick = () => fetchLatest();
-  q.oninput = () => {
-    const term = q.value.trim().toLowerCase();
-    document.querySelectorAll(".card").forEach(c=>{
-      const t = c.querySelector(".title").innerText.toLowerCase();
-      c.style.display = t.includes(term) ? "" : "none";
-    });
-  }
-
-  // старт
-  fetchLatest();
-</script>
-</body>
-</html>
