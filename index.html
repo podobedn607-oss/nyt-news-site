@@ -17,11 +17,8 @@
 *{box-sizing:border-box;}
 html,body{margin:0;font-family:Inter,Arial,sans-serif;height:100%;background:linear-gradient(180deg,#021428 0%,#07203a 40%,#091934 100%);color:#e6eef6;}
 .container{max-width:1200px;margin:24px auto;padding:24px}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:24px}
-.logo-center{display:flex;align-items:center;justify-content:center;gap:16px;flex:1;position:relative}
+header{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
 .logo{font-weight:700;color:white;font-size:1.6rem;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
-.flag{height:28px;width:42px;border-radius:4px;object-fit:cover;cursor:pointer;transition:transform 0.2s;}
-.flag:hover{transform:scale(1.1);}
 .top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
 input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:inherit;flex:1;min-width:180px}
 .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;transition:all 0.2s;}
@@ -43,17 +40,12 @@ input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(25
 .loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .author-label{position:fixed;left:16px;bottom:16px;font-size:0.95rem;color:white;font-weight:500;opacity:0.85;z-index:1000}
-.highlight{border:2px solid var(--accent);}
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <img class="flag" src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USA Flag">
-    <div class="logo-center">
-      <div class="logo">NYT</div>
-    </div>
-    <img class="flag" src="https://upload.wikimedia.org/wikipedia/ru/f/f3/Flag_of_Russia.svg" alt="Russia Flag">
+    <div class="logo">NYT</div>
   </header>
 
   <div class="top-controls">
@@ -69,7 +61,7 @@ input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(25
 <div class="author-label">Автор – Nikita Podobed | Техподдержка: +89854449930</div>
 
 <script>
-const SERVER = "http://localhost:8000";
+const SERVER = "http://localhost:8000"; // <-- замените на ваш публичный backend URL если нужно
 const listEl = document.getElementById("list");
 const articleView = document.getElementById("articleView");
 const q = document.getElementById("q");
@@ -110,7 +102,6 @@ function renderNextPage(){
     btns.appendChild(readBtn); btns.appendChild(sendBtn);
     card.appendChild(thumb); card.appendChild(title); card.appendChild(meta); card.appendChild(summary); card.appendChild(btns);
     listEl.appendChild(card);
-    // Анимация появления
     setTimeout(()=>card.classList.add('visible'), idx*100);
   });
   displayedCount += nextItems.length;
