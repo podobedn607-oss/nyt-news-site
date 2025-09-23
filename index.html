@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NYT → GPT — Новости и перевод</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -12,152 +12,135 @@
   --accent:#ff6b6b;
   --muted:#94a3b8;
   --glass: rgba(255,255,255,0.04);
+  --shadow: rgba(2,8,23,0.6);
 }
-html,body{
-  height:100%;
-  margin:0;
-  font-family:Inter,Arial,Helvetica,sans-serif;
-  background: linear-gradient(180deg,#021428 0%, #07203a 40%, #091934 100%);
-  color:#e6eef6;
-  position:relative;
-}
-.container{max-width:1100px;margin:24px auto;padding:24px}
-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
-header h1{margin:0;font-size:1.6rem}
+*{box-sizing:border-box;}
+html,body{margin:0;font-family:Inter,Arial,sans-serif;height:100%;background:linear-gradient(180deg,#021428 0%,#07203a 40%,#091934 100%);color:#e6eef6;}
+.container{max-width:1200px;margin:24px auto;padding:24px}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:24px}
+.logo-center{display:flex;align-items:center;justify-content:center;gap:16px;flex:1;position:relative}
+.logo{font-weight:700;color:white;font-size:1.6rem;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
+.flag{height:28px;width:42px;border-radius:4px;object-fit:cover;cursor:pointer;transition:transform 0.2s;}
+.flag:hover{transform:scale(1.1);}
+.top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:inherit;flex:1;min-width:180px}
+.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;transition:all 0.2s;}
+.btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
+.btn.read:hover{opacity:0.85;transform:scale(1.03);}
+.btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
+.btn.send:hover{opacity:0.85;transform:scale(1.03);}
+.btn.reload{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--muted);}
+.btn.reload:hover{background:var(--glass);}
+.btn.more{background:var(--accent);color:white;margin-top:12px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(2,8,23,0.6);border:1px solid rgba(255,255,255,0.03);}
+.card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 30px var(--shadow);border:1px solid rgba(255,255,255,0.03);transition:transform 0.3s,opacity 0.3s;opacity:0;transform:translateY(20px);}
+.card.visible{opacity:1;transform:translateY(0);}
 .thumb{height:160px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px}
 .title{font-weight:600;margin:0 0 8px 0}
 .meta{font-size:0.85rem;color:var(--muted);margin-bottom:10px}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-.btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
-.btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
-#articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap}
-.top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
-input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+#articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap;overflow:auto;transition:all 0.3s;}
 .loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.hero{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#f97316);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
 .author-label{position:fixed;left:16px;bottom:16px;font-size:0.95rem;color:white;font-weight:500;opacity:0.85;z-index:1000}
+.highlight{border:2px solid var(--accent);}
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <div class="hero">
+    <img class="flag" src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USA Flag">
+    <div class="logo-center">
       <div class="logo">NYT</div>
-      <div>
-        <h1>NYT → GPT: последние статьи</h1>
-        <div style="color:var(--muted)">Просматривай последние статьи NYT и переводь/объясняй их с помощью GPT</div>
-      </div>
     </div>
-    <div style="flex:1"></div>
-    <div class="top-controls">
-      <input id="q" type="search" placeholder="Поиск по заголовкам..." />
-      <button id="reload" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06)">Загрузить свежие статьи</button>
-    </div>
+    <img class="flag" src="https://upload.wikimedia.org/wikipedia/ru/f/f3/Flag_of_Russia.svg" alt="Russia Flag">
   </header>
 
+  <div class="top-controls">
+    <input id="q" type="search" placeholder="Поиск по заголовкам...">
+    <button id="reload" class="btn btn.reload">Загрузить свежие статьи</button>
+  </div>
+
   <section id="list" class="grid"></section>
+  <button id="more" class="btn btn.more">Загрузить ещё</button>
   <div id="articleView"></div>
 </div>
 
 <div class="author-label">Автор – Nikita Podobed | Техподдержка: +89854449930</div>
 
 <script>
-const SERVER = (window.location.protocol === "file:" || window.location.hostname === "localhost")
-    ? "http://localhost:8000"
-    : `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}`;
-
+const SERVER = "http://localhost:8000";
 const listEl = document.getElementById("list");
 const articleView = document.getElementById("articleView");
 const q = document.getElementById("q");
 const reload = document.getElementById("reload");
-
+const more = document.getElementById("more");
 let articlesCache = [];
+let displayedCount = 0;
+const pageSize = 10;
 
 async function fetchLatest(){
-  listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center"><span class="loader"></span> Загрузка...</div>';
+  listEl.innerHTML='<div style="grid-column:1/-1;text-align:center"><span class="loader"></span> Загрузка...</div>';
   try{
     const res = await fetch(`${SERVER}/latest?count=50`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     articlesCache = data.items || [];
-    renderList(articlesCache);
+    displayedCount = 0;
+    listEl.innerHTML = '';
+    renderNextPage();
   }catch(e){
-    listEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: ${e.message}</div>`;
+    listEl.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: ${e.message}</div>`;
   }
 }
 
-function renderList(items){
-  if(!items || items.length===0){
-    listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted)">Статей не найдено</div>';
-    return;
-  }
-  listEl.innerHTML = "";
-  items.forEach((it, idx)=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const imgUrl=it.image||`https://source.unsplash.com/collection/928423/800x600?sig=${idx}`;
-    const thumb=document.createElement("div");
-    thumb.className="thumb";
-    thumb.style.backgroundImage=`url('${imgUrl}')`;
-    const title=document.createElement("h3");
-    title.className="title";
-    title.innerText=it.title;
-    const meta=document.createElement("div");
-    meta.className="meta";
-    meta.innerText=it.published||it.link;
-    const summary=document.createElement("div");
-    summary.style.marginBottom="10px";
-    summary.style.color="var(--muted)";
-    summary.innerHTML=it.summary||"";
-
-    const btns=document.createElement("div");
-    btns.className="btns";
-    const readBtn=document.createElement("button");
-    readBtn.className="btn read";
-    readBtn.innerText="Читать & Перевести";
-    readBtn.onclick=()=>loadArticle(it.link);
-    const sendBtn=document.createElement("button");
-    sendBtn.className="btn send";
-    sendBtn.innerText="Отправить боту";
-    sendBtn.onclick=()=>sendToBot(it.link);
-    btns.appendChild(readBtn);btns.appendChild(sendBtn);
-
-    card.appendChild(thumb);
-    card.appendChild(title);
-    card.appendChild(meta);
-    card.appendChild(summary);
-    card.appendChild(btns);
+function renderNextPage(){
+  const nextItems = articlesCache.slice(displayedCount, displayedCount+pageSize);
+  nextItems.forEach((it,idx)=>{
+    const card = document.createElement("div");
+    card.className = "card";
+    const imgUrl = it.image||`https://source.unsplash.com/collection/928423/800x600?sig=${displayedCount+idx}`;
+    const thumb = document.createElement("div"); thumb.className="thumb"; thumb.style.backgroundImage=`url('${imgUrl}')`;
+    const title = document.createElement("h3"); title.className="title"; title.innerText=it.title;
+    const meta = document.createElement("div"); meta.className="meta"; meta.innerText=it.published||it.link;
+    const summary = document.createElement("div"); summary.style.marginBottom="10px"; summary.style.color="var(--muted)"; summary.innerHTML=it.summary||"";
+    const btns = document.createElement("div"); btns.className="btns";
+    const readBtn = document.createElement("button"); readBtn.className="btn read"; readBtn.innerText="Читать & Перевести"; readBtn.onclick=()=>loadArticle(it.link,true);
+    const sendBtn = document.createElement("button"); sendBtn.className="btn send"; sendBtn.innerText="Отправить боту"; sendBtn.onclick=()=>sendToBot(it.link);
+    btns.appendChild(readBtn); btns.appendChild(sendBtn);
+    card.appendChild(thumb); card.appendChild(title); card.appendChild(meta); card.appendChild(summary); card.appendChild(btns);
     listEl.appendChild(card);
+    // Анимация появления
+    setTimeout(()=>card.classList.add('visible'), idx*100);
   });
+  displayedCount += nextItems.length;
+  more.style.display = displayedCount >= articlesCache.length ? 'none' : 'inline-block';
 }
 
-q.oninput=()=>{
-  const term=q.value.trim().toLowerCase();
-  const filtered=articlesCache.filter(a=>a.title.toLowerCase().includes(term));
-  renderList(filtered);
+q.oninput = () => {
+  const term = q.value.trim().toLowerCase();
+  listEl.innerHTML = '';
+  displayedCount = 0;
+  renderNextPage();
+  if(term){
+    Array.from(listEl.children).forEach(card=>{
+      const t = card.querySelector('.title').innerText.toLowerCase();
+      card.style.display = t.includes(term) ? '' : 'none';
+    });
+  }
 }
 
-async function loadArticle(url){
+async function loadArticle(url, scroll=true){
   articleView.innerHTML="<div style='text-align:center'><span class='loader'></span> Получаем статью...</div>";
   try{
-    const res=await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
+    const res = await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json=await res.json();
-    if(json.error){
-      articleView.innerHTML=`<div style="color:#ff8b8b">${json.error}</div>`;
-      return;
-    }
+    const json = await res.json();
+    if(json.error){articleView.innerHTML=`<div style="color:#ff8b8b">${json.error}</div>`; return;}
     const html=`
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div style="font-weight:700">${json.link}</div>
-        <div>
-          <button class="btn send" onclick="sendToBot('${json.link.replaceAll("'", "\\'")}')">Отправить боту</button>
-        </div>
+        <div><button class="btn send" onclick="sendToBot('${json.link.replaceAll("'", "\\'")}')">Отправить боту</button></div>
       </div>
       <h2 style="margin-top:12px;margin-bottom:8px">${json.title||""}</h2>
       <div style="color:var(--muted);margin-bottom:12px">Исходный текст:</div>
@@ -166,17 +149,17 @@ async function loadArticle(url){
       <div style="color:var(--muted);margin-bottom:8px">Перевод (GPT):</div>
       <div style="background:#021826;padding:12px;border-radius:8px;color:#dff6ea;white-space:pre-wrap">${escapeHtml(json.translation||"").replace(/\n/g,'<br>')}</div>
     `;
-    articleView.innerHTML=html;
-    window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-  }catch(e){
-    articleView.innerHTML=`<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;
-  }
+    articleView.innerHTML = html;
+    if(scroll) articleView.scrollIntoView({behavior:"smooth"});
+  }catch(e){articleView.innerHTML=`<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;}
 }
 
-function escapeHtml(unsafe){if(!unsafe)return"";return unsafe.replace(/[&<"'>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function sendToBot(url){if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.sendData(url);alert("Ссылка отправлена боту");}else{navigator.clipboard.writeText(url);alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");}}
+function escapeHtml(u){if(!u) return ""; return u.replace(/[&<"'>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function sendToBot(url){if(window.Telegram && window.Telegram.WebApp){window.Telegram.WebApp.sendData(url);alert("Ссылка отправлена боту");}else{navigator.clipboard.writeText(url);alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");}}
 
-reload.onclick=()=>fetchLatest();
+reload.onclick = () => {articlesCache=[]; displayedCount=0; fetchLatest();}
+more.onclick = () => renderNextPage();
+
 fetchLatest();
 </script>
 </body>
