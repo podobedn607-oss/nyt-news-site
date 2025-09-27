@@ -2,554 +2,613 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>DailyFlow — Ежедневник и помощник</title>
-
-<!-- Google font -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>StarFlow — Ежедневник</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --bg:#0b1220; --card:#0f1724; --muted:#9fb0c8; --accent:#7c5cff;
-  --glass: rgba(255,255,255,0.04); --good:#10b981; --danger:#ff6b6b;
-  --text:#e6eef6; --shadow: 0 6px 30px rgba(2,6,23,0.6);
-  --radius:12px;
+  --bg-1: #030317;
+  --bg-2: #061234;
+  --card: rgba(255,255,255,0.03);
+  --glass: rgba(255,255,255,0.03);
+  --muted: #9fb0c8;
+  --accent: linear-gradient(90deg,#7c5cff,#ff7ab6);
+  --accent-plain: #7c5cff;
+  --success: #22c55e;
+  --danger: #ff5c6c;
+  --text: #e6eef6;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(2,6,23,0.6);
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--text);background:
-  radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.12), transparent 8%),
-  linear-gradient(180deg,#041022 0%, #071829 60%, #081826 100%);}
-.app{max-width:1200px;margin:28px auto;padding:20px}
-.header{display:flex;align-items:center;gap:16px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ff7ab6);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;box-shadow:0 8px 30px rgba(124,92,255,0.18)}
-.h1{font-size:20px;margin:0}
-.h1 small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-.tools{margin-left:auto;display:flex;gap:10px;align-items:center}
-.btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:600;backdrop-filter: blur(4px)}
-.btn.primary{background:linear-gradient(90deg,var(--accent),#ff7ab6);border:none;color:#fff}
-.search{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
-.layout{display:grid;grid-template-columns:360px 1fr 360px;gap:18px;margin-top:18px}
-.left, .right{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
-.center{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03);min-height:520px}
-.section-title{font-weight:700;margin:0 0 8px 0}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:
+  radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.06), transparent 8%),
+  linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 80%);color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:1100px;margin:16px auto;padding:12px}
+.header{display:flex;align-items:center;gap:12px;padding:8px 4px}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#7c5cff,#ff7ab6);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;box-shadow:0 10px 30px rgba(124,92,255,0.18)}
+.title{font-weight:700;font-size:18px}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:600}
+.btn.primary{background:linear-gradient(90deg,#7c5cff,#ff7ab6);border:none;color:white;box-shadow:0 6px 18px rgba(124,92,255,0.12)}
+.search{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--text);min-width:160px}
+
+/* overall layout */
+.container{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:12px}
+.left{min-height:640px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:16px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.02)}
+.right{min-height:640px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:16px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.02)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700;background:transparent;border:1px solid rgba(255,255,255,0.02)}
+.tab.active{background:linear-gradient(90deg,#7c5cff,#ff7ab6);color:white;box-shadow:0 8px 30px rgba(124,92,255,0.10)}
+.content{padding:8px}
+.section-title{font-weight:700;margin:6px 0 10px 0;font-size:16px}
 .small{font-size:13px;color:var(--muted)}
 
-.card{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.02)}
-.todo-list{max-height:420px;overflow:auto;padding-right:6px}
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:8px}
-.check{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.check.checked{background:linear-gradient(90deg,var(--good),#38bdf8);border:none;color:white}
-.t-title{font-weight:600}
-.meta{font-size:12px;color:var(--muted);margin-top:6px}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
+/* Tasks list */
+.tasks{display:flex;flex-direction:column;gap:10px}
+.task-card{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02);transition:transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s;}
+.task-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(2,6,23,0.6)}
+.task-left{width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.task-left.done{background:linear-gradient(90deg,#22c55e,#06b6d4);color:white;border:none}
+.task-body{flex:1}
+.task-title{font-weight:700}
+.task-meta{font-size:12px;color:var(--muted)}
+.task-actions{display:flex;gap:6px}
 
-.calendar{display:flex;flex-direction:column;gap:8px}
-.day-row{display:flex;gap:8px;align-items:center}
-.day{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
-.day.active{background:linear-gradient(90deg,var(--accent),#ff7ab6);color:white}
+/* cowboy animation area */
+.cowboy-area{position:relative;height:90px;overflow:hidden;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;padding:8px}
+.cowboy{position:absolute;left:10px;bottom:6px;width:80px;transform-origin:center;transition:transform .25s}
+.cowboy img{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.6))}
 
-.event-card{padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));margin-bottom:8px}
-.event-title{font-weight:700}
-.event-time{font-size:13px;color:var(--muted)}
-
-.assistant{display:flex;flex-direction:column;height:520px}
-.assistant .messages{flex:1;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-.assistant .input{display:flex;gap:8px;padding-top:10px}
-.input textarea{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--text);min-height:56px}
-.small-muted{font-size:12px;color:var(--muted)}
-
-.footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
-
-/* responsive */
-@media (max-width:1100px){
-  .layout{grid-template-columns:1fr; padding-bottom:80px}
-  .left,.right{order:2}
-  .center{order:1}
+/* running animation (CSS sprite-like small oscillation) */
+@keyframes run-cycle {
+  0%{transform:translateX(0) rotate(0) scale(1)}
+  30%{transform:translateX(10px) rotate(-2deg) scale(1.02)}
+  60%{transform:translateX(-6px) rotate(1deg) scale(0.99)}
+  100%{transform:translateX(0) rotate(0) scale(1)}
 }
-</style>
+.cowboy.run{animation:run-cycle .9s linear infinite}
 
+/* pop-in for new task */
+@keyframes pop-in {
+  0%{opacity:0; transform:scale(.92)}
+  60%{opacity:1; transform:scale(1.03)}
+  100%{transform:scale(1)}
+}
+.task-card.new{animation:pop-in .45s cubic-bezier(.2,.9,.2,1)}
+
+/* complete pulse */
+@keyframes pulse {
+  0%{box-shadow:0 0 0 rgba(34,197,94,0.0)}
+  50%{box-shadow:0 0 18px rgba(34,197,94,0.18)}
+  100%{box-shadow:0 0 0 rgba(34,197,94,0.0)}
+}
+.task-card.completed{animation:pulse .9s ease-out 1}
+
+/* Calendar */
+.calendar {display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-cell{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:8px;border-radius:8px;min-height:80px;border:1px solid rgba(255,255,255,0.02);position:relative}
+.cal-cell .daynum{position:absolute;top:8px;left:8px;font-weight:700}
+.cal-cell .events{position:absolute;bottom:8px;left:8px;right:8px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.cal-cell.today{outline:2px solid rgba(124,92,255,0.14)}
+
+/* mobile responsive */
+@media (max-width:900px){
+  .container{grid-template-columns:1fr; padding-bottom:60px}
+  .right{order:2}
+  .left{order:1}
+  .cowboy-area{height:76px}
+  .cowboy{width:64px}
+  .logo{width:52px;height:52px}
+  .title{font-size:16px}
+}
+
+/* cosmic particles - background decoration */
+.particles{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;mix-blend-mode:screen;opacity:0.35}
+.particle{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff8 0%, #fff0 50%);filter:blur(6px);opacity:0.6}
+</style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    <div class="brand">
-      <div class="logo">DF</div>
-      <div>
-        <h1 class="h1">DailyFlow <small>Ежедневник, напоминания и веб-помощник</small></h1>
-      </div>
-    </div>
+<div class="particles" id="particles"></div>
 
-    <div class="tools">
-      <input id="search" class="search" placeholder="Поиск задач, событий..." />
-      <button id="btnAddTask" class="btn">+ Новая задача</button>
-      <button id="btnAddEvent" class="btn">+ Событие</button>
-      <button id="btnSettings" class="btn">⚙ Настройки</button>
+<div class="app" id="appRoot">
+  <div class="header">
+    <div class="logo">SF</div>
+    <div>
+      <div class="title">StarFlow <div class="small">Ежедневник — напоминания — космический стиль</div></div>
+    </div>
+    <div class="header-right">
+      <input id="search" class="search" placeholder="Поиск задач..." />
+      <button id="btnAdd" class="btn primary">+ Задача</button>
+      <button id="btnMenu" class="btn">☰</button>
     </div>
   </div>
 
-  <div class="layout">
-    <!-- LEFT: Контекст / Today / Tasks -->
+  <div class="container" id="mainContainer">
+    <!-- LEFT: tabs and tasks -->
     <div class="left">
-      <div class="card">
-        <div class="section-title">Сегодня</div>
-        <div id="todayDate" class="small muted small-muted"></div>
-        <div id="digest" class="meta" style="margin-top:10px">Ежедневный дайджест: пока пусто</div>
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="tasks">Задачи</div>
+        <div class="tab" data-tab="calendar">Календарь</div>
+        <div class="tab" data-tab="digest">Дайджест</div>
+        <div class="tab" data-tab="settings">Настройки</div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Задачи</div>
-        <div class="small">Список задач — отмечай как выполненное</div>
-        <div class="todo-list" id="todoList" style="margin-top:10px"></div>
-        <div style="margin-top:8px" class="controls">
-          <button id="btnExport" class="btn">Экспорт</button>
-          <button id="btnImport" class="btn">Импорт</button>
-          <button id="btnClear" class="btn">Очистить</button>
+      <div class="content">
+        <!-- TASKS TAB -->
+        <div class="tab-pane" id="pane-tasks">
+          <div class="section-title">Мои задачи</div>
+          <div class="small">Добавляй дела, назначай дедлайны и приоритеты</div>
+          <div style="height:12px"></div>
+
+          <div class="cowboy-area" id="cowboyArea" aria-hidden>
+            <!-- cowboy image: replace assets/cowboy.png with your image file if you have one -->
+            <div class="cowboy" id="cowboy">
+              <img src="assets/cowboy.png" alt="cowboy" id="cowboyImg" />
+            </div>
+            <div style="margin-left:120px;color:var(--muted);">Ковбой возле задач — он бегает, когда ты добавляешь или выполняешь задачу 🤠</div>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="tasks" id="tasksList"></div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="section-title">Календарь (выбери дату)</div>
-        <div id="calendar" class="calendar"></div>
-      </div>
-    </div>
-
-    <!-- CENTER: Основной поток / список событий / редактор -->
-    <div class="center">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <h2 style="margin:0">План на день</h2>
-        <div class="small-muted">Сортировка <select id="sortSel" style="background:transparent;color:var(--text);border:none">
-          <option value="time">по времени</option>
-          <option value="priority">по приоритету</option>
-        </select></div>
-      </div>
-
-      <div id="eventsFeed" style="margin-top:12px"></div>
-
-      <div class="card" style="margin-top:12px">
-        <div class="section-title">Добавить задачу / событие</div>
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <input id="taskTitle" placeholder="Название задачи" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
-          <select id="priority" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)">
-            <option value="low">Low</option>
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
-          </select>
-          <input id="dueDate" type="date" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
-          <input id="dueTime" type="time" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
-          <button id="addTaskBtn" class="btn primary">Добавить</button>
+        <!-- CALENDAR TAB -->
+        <div class="tab-pane" id="pane-calendar" style="display:none">
+          <div class="cal-head">
+            <div>
+              <button class="btn" id="calPrev">&larr;</button>
+              <span id="calMonth" style="font-weight:700;margin:0 10px"></span>
+              <button class="btn" id="calNext">&rarr;</button>
+            </div>
+            <div class="small">Клик на дату, чтобы добавить событие</div>
+          </div>
+          <div class="calendar" id="calendarGrid"></div>
         </div>
-      </div>
 
-    </div>
-
-    <!-- RIGHT: Assistant / settings -->
-    <div class="right">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="section-title">Веб-помощник</div>
-          <div class="small-muted">Встроенный ассистент — ответы локально + опция OpenAI</div>
+        <!-- DIGEST TAB -->
+        <div class="tab-pane" id="pane-digest" style="display:none">
+          <div class="section-title">Ежедневный дайджест</div>
+          <div class="small">Краткий обзор задач и событий на выбранный день</div>
+          <div id="digestArea" style="margin-top:12px"></div>
         </div>
-        <button id="clearChat" class="btn">🧹</button>
-      </div>
 
-      <div class="assistant card" style="margin-top:10px">
-        <div class="messages" id="messages"></div>
-        <div class="input">
-          <textarea id="assistantInput" placeholder="Спроси помощника: где мой дедлайн? как настроить уведомления?"></textarea>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <button id="sendMsg" class="btn primary">Отправить</button>
-            <button id="useOpenAI" class="btn">OpenAI (опция)</button>
+        <!-- SETTINGS TAB -->
+        <div class="tab-pane" id="pane-settings" style="display:none">
+          <div class="section-title">Настройки</div>
+          <div class="small">Уведомления и синхронизация</div>
+          <div style="margin-top:12px" class="small">
+            <label><input type="checkbox" id="notifToggle"> Включить браузерные уведомления</label><br/>
+            <label><input type="checkbox" id="soundToggle" checked> Звук при напоминании</label><br/>
+            <div style="height:8px"></div>
+            <button id="btnExport" class="btn">Экспорт данных</button>
+            <button id="btnImport" class="btn">Импорт данных</button>
+            <button id="btnClearAll" class="btn">Очистить всё</button>
           </div>
         </div>
-        <div style="margin-top:8px">
-          <div class="small-muted">OpenAI ключ: <input id="openaiKey" placeholder="sk-..." style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" /></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: quick add & upcoming -->
+    <div class="right">
+      <div class="section-title">Быстрое добавление</div>
+      <div class="small">Создать задачу за 2 шага</div>
+
+      <div style="height:12px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input id="quickTitle" placeholder="Название задачи" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+        <input id="quickDate" type="date" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+        <input id="quickTime" type="time" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+        <select id="quickPriority" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)">
+          <option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option>
+        </select>
+        <div style="display:flex;gap:8px">
+          <button id="quickAddBtn" class="btn primary">Добавить задачу</button>
+          <button id="quickAddEvent" class="btn">Добавить событие</button>
         </div>
       </div>
 
-      <div style="margin-top:12px" class="card">
-        <div class="section-title">Настройки</div>
-        <div style="margin-top:8px" class="small-muted">
-          <label><input id="notificationsToggle" type="checkbox" /> Включить браузерные уведомления</label><br/>
-          <label><input id="soundToggle" type="checkbox" /> Звук при напоминании</label><br/>
-          <label><input id="dailyToggle" type="checkbox" /> Ежедневный дайджест (утром)</label>
-        </div>
-      </div>
-
+      <div style="height:18px"></div>
+      <div class="section-title">Скоро</div>
+      <div id="upcomingList" class="small" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
   </div>
-
-  <div class="footer">DailyFlow — делай больше, забывай меньше. © 2025</div>
 </div>
 
-<!-- Audio -->
-<audio id="ding" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="></audio>
+<!-- audio ding -->
+<audio id="audioDing">
+  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=" type="audio/wav">
+</audio>
 
 <script>
-/* ========= Простой SPA логика ========= */
+/* ====== configuration & assets ====== */
+// change cowboySrc to your provided image file path if you have one
+const cowboySrc = "assets/cowboy.png"; // <- put your cowboy image in assets/cowboy.png or change path
+// If you're hosting on GitHub Pages, upload assets/cowboy.png into repo next to index.html
 
-/* STORAGE key */
-const STORAGE_KEY = "dailyflow_v1";
+/* ====== state & storage ====== */
+const STORAGE = "starflow_v1";
+let state = { tasks: [], events: [], settings: {notifications:false, sound:true} };
 
-/* state */
-let state = {
-  tasks: [], // {id,title,date,time,priority,done}
-  events: [], // {id,title,link,date,time,desc}
-  messages: [], // assistant messages
-  settings: { notifications: false, sound: true, dailyDigest: false, openaiKey: "" }
-};
-
-/* init */
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8) }
-
+/* load/save */
 function loadState(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){ state = JSON.parse(raw); }
-  } catch(e){ console.error("loadState", e); }
+  try{
+    const raw = localStorage.getItem(STORAGE);
+    if(raw) state = JSON.parse(raw);
+  }catch(e){ console.error(e); }
 }
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function saveState(){ localStorage.setItem(STORAGE, JSON.stringify(state)); }
 
-function formatDate(d){
-  const dt = new Date(d);
-  return dt.toLocaleDateString();
+/* init demo if empty */
+function seedData(){
+  if(state.tasks.length===0 && state.events.length===0){
+    const d = new Date().toISOString().slice(0,10);
+    state.tasks.push({id: uid(), title:"Проверить почту", date:d, time:"09:00", priority:"medium", done:false});
+    state.tasks.push({id: uid(), title:"Подготовить отчет", date:d, time:"15:00", priority:"high", done:false});
+    state.events.push({id: uid(), title:"Встреча с командой", date:d, time:"11:00", desc:"Zoom — план спринта"});
+    saveState();
+  }
 }
 
-/* Rendering */
-const todayDate = document.getElementById("todayDate");
-const todoList = document.getElementById("todoList");
-const eventsFeed = document.getElementById("eventsFeed");
-const calendar = document.getElementById("calendar");
-const digest = document.getElementById("digest");
-const messagesEl = document.getElementById("messages");
-const openaiKeyInput = document.getElementById("openaiKey");
+/* utils */
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6) }
+function el(q) { return document.querySelector(q) }
+function els(q) { return Array.from(document.querySelectorAll(q)) }
+function dateKey(dt){ return dt ? dt.slice(0,10) : null }
 
-function render(){
-  // header date
-  const now = new Date();
-  todayDate.textContent = now.toLocaleString();
+/* ====== render ====== */
+const tasksList = el("#tasksList");
+const upcomingList = el("#upcomingList");
+const cowboyEl = el("#cowboy");
+const cowboyArea = el("#cowboyArea");
+const audioDing = el("#audioDing");
 
-  // todo list
-  todoList.innerHTML = "";
-  state.tasks.sort((a,b)=> (a.done - b.done) || (a.priority === b.priority ? 0 : (a.priority==="high"? -1:1)));
-  state.tasks.forEach(t=>{
-    const div = document.createElement("div");
-    div.className = "todo-item";
-    div.innerHTML = `
-      <div class="check ${t.done ? "checked":""}" data-id="${t.id}">${t.done ? "✓":""}</div>
-      <div style="flex:1">
-        <div class="t-title">${escapeHtml(t.title)}</div>
-        <div class="meta">${t.date ? t.date : "без даты"} ${t.time ? "• "+t.time : ""} • ${t.priority}</div>
+function renderAll(){
+  renderTasks();
+  renderUpcoming();
+  renderCalendar(currentYear, currentMonth);
+  renderDigest();
+}
+
+/* tasks */
+function renderTasks(){
+  tasksList.innerHTML = "";
+  // sort: unfinished by priority then time
+  const sorted = state.tasks.slice().sort((a,b)=>{
+    if(a.done !== b.done) return a.done?1:-1;
+    if(a.priority!==b.priority) return (a.priority==="high"? -1:1);
+    if(a.date && b.date) return (a.date < b.date ? -1:1);
+    return 0;
+  });
+  sorted.forEach(t=>{
+    const card = document.createElement("div");
+    card.className = "task-card"+ (t.new? " new": "") + (t.done? " completed": "");
+    card.dataset.id = t.id;
+    card.innerHTML = `
+      <div class="task-left ${t.done? "done": ""}" data-action="toggle">${t.done? "✓": ""}</div>
+      <div class="task-body">
+        <div class="task-title">${escapeHtml(t.title)}</div>
+        <div class="task-meta">${t.date? t.date : "без даты"} ${t.time? " • "+t.time : ""} • ${t.priority}</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn" data-edit="${t.id}">✏</button>
-        <button class="btn" data-del="${t.id}">🗑</button>
+      <div class="task-actions">
+        <button class="btn" data-action="edit">✏</button>
+        <button class="btn" data-action="del">🗑</button>
       </div>
     `;
-    todoList.appendChild(div);
+    tasksList.appendChild(card);
+    // remove new flag after animation
+    if(t.new){ setTimeout(()=> { delete t.new; saveState(); renderTasks(); }, 700); }
   });
-
-  // events feed (today)
-  eventsFeed.innerHTML = "";
-  const dayKey = (new Date()).toISOString().slice(0,10);
-  const todays = state.events.filter(e=> e.date === dayKey).sort((a,b)=> (a.time||"") < (b.time||"") ? -1:1);
-  if(todays.length===0){
-    eventsFeed.innerHTML = `<div class="small-muted">Сегодня нет событий</div>`;
-  }else{
-    todays.forEach(ev=>{
-      const el = document.createElement("div");
-      el.className = "event-card";
-      el.innerHTML = `<div class="event-title">${escapeHtml(ev.title)}</div>
-        <div class="event-time">${ev.time || "время не указано"}</div>
-        <div class="small" style="margin-top:8px">${escapeHtml(ev.desc || "")}</div>
-      `;
-      eventsFeed.appendChild(el);
-    });
-  }
-
-  // calendar: simple next 14 days
-  calendar.innerHTML = "";
-  const start = new Date();
-  for(let i=0;i<14;i++){
-    const d = new Date(start);
-    d.setDate(start.getDate()+i);
-    const key = d.toISOString().slice(0,10);
-    const count = state.events.filter(ev=>ev.date===key).length + state.tasks.filter(t=>t.date===key && !t.done).length;
-    const day = document.createElement("div");
-    day.className = "day-row";
-    day.innerHTML = `<div class="day ${i===0?'active':''}" data-date="${key}">${d.getDate()}</div>
-      <div style="font-size:13px;color:var(--muted)">${d.toLocaleDateString(undefined,{weekday:'short'})} ${count?(" • "+count):""}</div>`;
-    calendar.appendChild(day);
-  }
-
-  // digest summary (simple)
-  const upcoming = state.events.slice(0,3).map(e=>e.title).join(" • ");
-  digest.textContent = upcoming ? upcoming : "Пусто — добавьте задачи или события";
-
-  // assistant messages
-  messagesEl.innerHTML = "";
-  state.messages.forEach(m=>{
-    const mdiv = document.createElement("div");
-    mdiv.style.marginBottom = "8px";
-    mdiv.innerHTML = `<div style="font-size:12px;color:var(--muted)">${m.role}</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-top:4px">${escapeHtml(m.text)}</div>`;
-    messagesEl.appendChild(mdiv);
-  });
-
-  openaiKeyInput.value = state.settings.openaiKey || "";
 }
 
-/* helpers */
-function escapeHtml(s){ if(!s) return ""; return s.replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+/* upcoming */
+function renderUpcoming(){
+  upcomingList.innerHTML = "";
+  const soon = state.tasks.concat(state.events).slice().sort((a,b)=>{
+    const ta = (a.date||"9999")+ (a.time||"00");
+    const tb = (b.date||"9999")+ (b.time||"00");
+    return ta < tb ? -1:1;
+  }).slice(0,6);
+  soon.forEach(it=>{
+    const div = document.createElement("div");
+    div.style.display = "flex"; div.style.justifyContent = "space-between";
+    div.innerHTML = `<div>${escapeHtml(it.title || it.eventTitle)} <div style="font-size:12px;color:${it.done? 'var(--muted)':''}">${it.date||''} ${it.time||''}</div></div>
+      <div style="color:var(--muted);font-size:12px">${it.priority? it.priority : "событие"}</div>`;
+    upcomingList.appendChild(div);
+  });
+}
 
-/* Actions: add/edit/delete tasks/events */
-document.getElementById("addTaskBtn").addEventListener("click", ()=>{
-  const title = document.getElementById("taskTitle").value.trim();
-  if(!title){ alert("Введите название задачи"); return; }
-  const date = document.getElementById("dueDate").value || null;
-  const time = document.getElementById("dueTime").value || null;
-  const priority = document.getElementById("priority").value || "medium";
-  const newTask = { id: uid(), title, date, time, priority, done:false };
-  state.tasks.push(newTask);
-  saveState(); render(); scheduleNotificationForTask(newTask);
-  document.getElementById("taskTitle").value = "";
-});
-
-document.getElementById("btnAddTask").addEventListener("click", ()=> document.getElementById("taskTitle").focus());
-document.getElementById("btnAddEvent").addEventListener("click", ()=> {
-  const title = prompt("Название события:");
-  if(!title) return;
-  const date = prompt("Дата (YYYY-MM-DD):", new Date().toISOString().slice(0,10));
-  const time = prompt("Время (HH:MM):", "");
-  const desc = prompt("Краткое описание:", "");
-  state.events.push({ id: uid(), title, date, time, desc });
-  saveState(); render();
-});
-
-/* delegated events for todo items */
-todoList.addEventListener("click", (ev)=>{
-  const ch = ev.target.closest(".check");
-  if(ch){
-    const id = ch.dataset.id;
+/* task interactions (delegated) */
+tasksList.addEventListener("click", (e)=>{
+  const action = e.target.closest("[data-action]");
+  if(!action) return;
+  const act = action.dataset.action;
+  const card = e.target.closest(".task-card");
+  const id = card.dataset.id;
+  if(act==="toggle"){
     const t = state.tasks.find(x=>x.id===id);
-    if(t){ t.done = !t.done; saveState(); render(); }
-  }
-  const del = ev.target.closest("[data-del]");
-  if(del){
-    const id = del.dataset.del;
-    state.tasks = state.tasks.filter(x=>x.id!==id);
-    saveState(); render();
-  }
-  const edit = ev.target.closest("[data-edit]");
-  if(edit){
-    const id = edit.dataset.edit;
+    if(t){ t.done = !t.done; t._justCompleted = t.done; saveState(); renderAll(); triggerCowboyRun(t._justCompleted ? "celebrate":"run"); if(t._justCompleted){ card.classList.add("completed"); setTimeout(()=>card.classList.remove("completed"),900);} }
+  } else if(act==="del"){
+    if(confirm("Удалить задачу?")){ state.tasks = state.tasks.filter(x=>x.id!==id); saveState(); renderAll(); }
+  } else if(act==="edit"){
     const t = state.tasks.find(x=>x.id===id);
     if(!t) return;
-    const newTitle = prompt("Редактировать заголовок:", t.title);
-    if(newTitle !== null){ t.title = newTitle; saveState(); render(); }
+    const newTitle = prompt("Редактировать задачу:", t.title);
+    if(newTitle !== null){ t.title = newTitle; saveState(); renderAll(); }
   }
 });
 
-/* import/export/clear */
-document.getElementById("btnExport").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = url; a.download = "dailyflow-export.json"; a.click();
+/* quick add */
+el("#quickAddBtn").addEventListener("click", ()=>{
+  const title = el("#quickTitle").value.trim(); if(!title) return alert("Введите название");
+  const date = el("#quickDate").value || null;
+  const time = el("#quickTime").value || null;
+  const priority = el("#quickPriority").value;
+  const task = { id: uid(), title, date, time, priority, done:false, new:true };
+  state.tasks.push(task); saveState(); renderAll(); el("#quickTitle").value=""; el("#quickDate").value=""; el("#quickTime").value="";
+  triggerCowboyRun("run");
+  scheduleCheck(); 
 });
-document.getElementById("btnImport").addEventListener("click", ()=>{
-  const input = document.createElement("input"); input.type="file"; input.accept=".json";
-  input.onchange = e => {
-    const f = e.target.files[0]; if(!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try { const j = JSON.parse(r.result); state = j; saveState(); render(); alert("Импорт выполнен"); } catch(err){ alert("Ошибка импорта"); }
-    }
-    r.readAsText(f);
-  }
-  input.click();
+
+/* main add button */
+el("#btnAdd").addEventListener("click", ()=> {
+  const title = prompt("Название задачи:");
+  if(!title) return;
+  const date = prompt("Дата (YYYY-MM-DD) — оставь пустым если нет:", "");
+  const time = prompt("Время (HH:MM) — оставь пустым если нет:", "");
+  const pr = prompt("Приоритет (low/medium/high)", "medium");
+  const task = { id: uid(), title, date: date||null, time: time||null, priority: pr||"medium", done:false, new:true };
+  state.tasks.push(task); saveState(); renderAll(); triggerCowboyRun("run"); scheduleCheck();
 });
-document.getElementById("btnClear").addEventListener("click", ()=>{
-  if(confirm("Удалить все данные (локально)?")){ state = {tasks:[],events:[],messages:[],settings:state.settings}; saveState(); render(); }
+
+/* quick event */
+el("#quickAddEvent").addEventListener("click", ()=>{
+  const title = el("#quickTitle").value.trim(); if(!title) return alert("Введите название события");
+  const date = el("#quickDate").value || null;
+  const time = el("#quickTime").value || null;
+  const ev = { id: uid(), title, date, time, desc:"" };
+  state.events.push(ev); saveState(); renderAll();
 });
 
 /* search */
-document.getElementById("search").addEventListener("input", (e)=>{
+el("#search").addEventListener("input",(e)=>{
   const q = e.target.value.toLowerCase();
-  document.querySelectorAll(".t-title").forEach(el=> {
-    el.closest(".todo-item").style.display = el.innerText.toLowerCase().includes(q) ? "" : "none";
+  els(".task-card").forEach(card=>{
+    const txt = (card.querySelector(".task-title").innerText || "").toLowerCase();
+    card.style.display = txt.includes(q) ? "" : "none";
   });
 });
 
-/* calendar click */
-calendar.addEventListener("click", (e)=>{
-  const d = e.target.closest(".day");
-  if(!d) return;
-  document.querySelectorAll(".day").forEach(x=>x.classList.remove("active"));
-  d.classList.add("active");
-  const date = d.dataset.date;
-  // show events for date
-  const list = state.events.filter(ev=>ev.date===date);
-  if(list.length===0){ alert("Событий на эту дату нет"); return; }
-  const txt = list.map(x=>`${x.time||''} ${x.title} — ${x.desc||''}`).join("\n\n");
-  alert("События:\n\n"+txt);
-});
+/* ===== calendar implementation (monthly view) ===== */
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
 
-/* Assistant */
-document.getElementById("sendMsg").addEventListener("click", async ()=>{
-  const txt = document.getElementById("assistantInput").value.trim();
-  if(!txt) return;
-  addMessage("user", txt);
-  document.getElementById("assistantInput").value = "";
-  // simple local rules:
-  const lower = txt.toLowerCase();
-  if(lower.includes("сколько") && lower.includes("задач")){
-    const pending = state.tasks.filter(t=>!t.done).length;
-    addMessage("assistant", `У тебя ${pending} невыполненных задач.`);
-    return;
-  }
-  if(lower.includes("напомни") || lower.includes("поставь напоминание")){
-    addMessage("assistant", "Чтобы поставить напоминание, добавь задачу и укажи дату/время. Также можно включить браузерные уведомления в настройках.");
-    return;
-  }
-
-  // if openai key present and user wants it
-  const useOpenAI = document.getElementById("useOpenAI").clickedTimes || false;
-  const key = state.settings.openaiKey || openaiKeyInput.value.trim();
-  if(key && (lower.includes("объясни") || lower.includes("переведи") || document.getElementById("useOpenAI").dataset.forced==="1")){
-    // call OpenAI
-    addMessage("assistant", "Запрос к OpenAI выполняется...");
-    try {
-      const resp = await callOpenAI(key, txt);
-      addMessage("assistant", resp || "[OpenAI вернул пустой ответ]");
-    } catch(e){
-      addMessage("assistant", "[Ошибка OpenAI] "+e.message);
+function renderCalendar(y,m){
+  const grid = el("#calendarGrid"); grid.innerHTML = "";
+  const monthNames = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+  el("#calMonth").innerText = monthNames[m] + " " + y;
+  const first = new Date(y,m,1);
+  const startDay = first.getDay(); // 0..6 (Sun..Sat)
+  // compute days in month
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  // fill leading empty cells for week start (we'll treat week starting Sun)
+  // create 7 * 6 grid cells
+  let cells = [];
+  for(let i=0;i<42;i++){ cells.push(i - startDay + 1); } // day number may be <=0 or > daysInMonth
+  cells.forEach(n=>{
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
+    if(n > 0 && n <= daysInMonth){
+      const dayStr = String(n).padStart(2,"0");
+      const dateStr = `${y}-${String(m+1).padStart(2,"0")}-${dayStr}`;
+      cell.innerHTML = `<div class="daynum">${n}</div><div class="events"></div>`;
+      // mark today
+      if(dateStr === (new Date()).toISOString().slice(0,10)) cell.classList.add("today");
+      // list events count
+      const evs = state.events.filter(ev=>ev.date === dateStr);
+      const tks = state.tasks.filter(t=>t.date === dateStr && !t.done);
+      const listEl = cell.querySelector(".events");
+      evs.slice(0,3).forEach(ev=>{
+        const d = document.createElement("div"); d.innerText = `📌 ${ev.title} ${ev.time? "• "+ev.time : ""}`; listEl.appendChild(d);
+      });
+      tks.slice(0,2).forEach(t=>{
+        const d = document.createElement("div"); d.innerText = `• ${t.title}`; d.style.color = "var(--muted)"; d.style.fontSize="12px"; listEl.appendChild(d);
+      });
+      // click to add event or see
+      cell.addEventListener("click", ()=> {
+        const act = prompt("Введите 1 чтобы добавить событие, 2 чтобы показать все события, 3 чтобы добавить задачу (1/2/3)", "2");
+        if(!act) return;
+        if(act === "1"){
+          const title = prompt("Название события:");
+          if(!title) return;
+          const time = prompt("Время (HH:MM)","")
+          state.events.push({id: uid(), title, date: dateStr, time, desc:""});
+          saveState(); renderAll();
+        } else if(act === "3"){
+          const title = prompt("Название задачи:");
+          if(!title) return;
+          const time = prompt("Время (HH:MM)","");
+          state.tasks.push({id: uid(), title, date: dateStr, time, priority:"medium", done:false, new:true});
+          saveState(); renderAll(); triggerCowboyRun("run");
+        } else {
+          const list = state.events.filter(ev=>ev.date===dateStr);
+          if(list.length===0) alert("Событий нет");
+          else alert(list.map(x=>`${x.time||""} ${x.title} — ${x.desc||""}`).join("\n\n"));
+        }
+      });
+    } else {
+      cell.style.opacity = "0.04";
     }
+    grid.appendChild(cell);
+  });
+}
+
+/* calendar navigation */
+el("#calPrev").addEventListener("click", ()=>{ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } renderCalendar(currentYear,currentMonth); });
+el("#calNext").addEventListener("click", ()=>{ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } renderCalendar(currentYear,currentMonth); });
+
+/* digest */
+function renderDigest(){
+  const todayKey = (new Date()).toISOString().slice(0,10);
+  const todaysTasks = state.tasks.filter(t=>t.date===todayKey && !t.done);
+  const todaysEvents = state.events.filter(e=>e.date===todayKey);
+  const elD = el("#digestArea"); elD.innerHTML = "";
+  if(todaysEvents.length===0 && todaysTasks.length===0){ elD.innerHTML = "<div class='small'>Сегодня ничего не запланировано</div>"; return; }
+  if(todaysEvents.length>0){
+    const h = document.createElement("div"); h.innerHTML = "<strong>События:</strong>"; elD.appendChild(h);
+    todaysEvents.forEach(e=> elD.appendChild(Object.assign(document.createElement("div"),{innerText:`${e.time||''} ${e.title}`})));
+  }
+  if(todaysTasks.length>0){
+    const h = document.createElement("div"); h.innerHTML = "<strong style='margin-top:8px'>Задачи:</strong>"; elD.appendChild(h);
+    todaysTasks.forEach(t=> elD.appendChild(Object.assign(document.createElement("div"),{innerText:`${t.time||''} ${t.title}`})));
+  }
+}
+
+/* ====== cowboy animation control ====== */
+function triggerCowboyRun(mode="run"){
+  const cow = cowboyEl;
+  if(!cow) return;
+  if(mode==="run"){
+    cow.classList.add("run");
+    setTimeout(()=> cow.classList.remove("run"), 1400);
+  } else if(mode==="celebrate"){
+    // bigger hop
+    cow.style.transform = "translateY(-8px) scale(1.05)";
+    setTimeout(()=> cow.style.transform = "", 900);
+  }
+}
+
+/* load cowboy image and fallback to svg if not found */
+function ensureCowboyImage(){
+  const img = el("#cowboyImg");
+  img.addEventListener("error", ()=>{
+    // fallback: simple SVG inline
+    img.style.display = "none";
+    const svgWrap = document.createElement("div");
+    svgWrap.style.width = "86px"; svgWrap.style.height="86px";
+    svgWrap.innerHTML = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,5)">
+        <rect width="80" height="50" rx="10" fill="#ffb86b"></rect>
+        <circle cx="18" cy="20" r="8" fill="#7c5cff"></circle>
+        <rect x="8" y="40" width="64" height="18" rx="6" fill="#7c5cff"></rect>
+      </g>
+    </svg>`;
+    cowboyEl.appendChild(svgWrap);
+  });
+}
+ensureCowboyImage();
+
+/* ====== storage actions (import/export/clear) ====== */
+el("#btnExport").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "starflow-export.json"; a.click();
+});
+el("#btnImport").addEventListener("click", ()=>{
+  const input = document.createElement("input"); input.type="file"; input.accept=".json";
+  input.onchange = e=> {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=> {
+      try { state = JSON.parse(r.result); saveState(); renderAll(); alert("Импорт завершён"); } catch(err){ alert("Ошибка импорта"); }
+    }; r.readAsText(f);
+  }; input.click();
+});
+el("#btnClearAll").addEventListener("click", ()=>{
+  if(confirm("Удалить все локальные данные?")){ state = {tasks:[],events:[],settings:{notifications:false,sound:true}}; saveState(); renderAll(); }
+});
+
+/* notifications & scheduler */
+el("#notifToggle").addEventListener("change",(e)=>{
+  w = e.target.checked;
+  if(w){
+    Notification.requestPermission().then(p=>{
+      if(p==="granted"){ state.settings.notifications=true; saveState(); alert("Уведомления разрешены"); }
+      else { e.target.checked=false; state.settings.notifications=false; saveState(); alert("Уведомления не разрешены"); }
+    });
   } else {
-    // fallback: echo + suggestion
-    addMessage("assistant", "Я локальный помощник: могу подсчитать задачи, подсказать как ставить напоминания и отправить события в бот. Попробуй: «Сколько задач у меня» или «Напомни мне завтра 10:00 позвонить».");
+    state.settings.notifications=false; saveState();
   }
 });
+el("#soundToggle").addEventListener("change",(e)=>{ state.settings.sound = e.target.checked; saveState(); });
 
-document.getElementById("useOpenAI").addEventListener("click", ()=>{
-  // mark that user wants to use OpenAI on next query
-  document.getElementById("useOpenAI").dataset.forced = "1";
-  document.getElementById("assistantInput").focus();
-});
-openaiKeyInput.addEventListener("change", ()=>{
-  state.settings.openaiKey = openaiKeyInput.value.trim();
-  saveState();
-});
-
-/* assistant message helpers */
-function addMessage(role, text){
-  state.messages.push({ id: uid(), role, text, ts: Date.now() });
-  saveState(); render();
-  // scroll messages
-  setTimeout(()=> messagesEl.scrollTop = messagesEl.scrollHeight, 50);
+function scheduleCheck(){
+  // called on add; main interval will check every 30 sec
 }
 
-/* OpenAI call (optional) */
-async function callOpenAI(key, prompt){
-  // note: this uses the Responses endpoint; may need adjustment
-  const res = await fetch("https://api.openai.com/v1/responses", {
-    method:"POST",
-    headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
-    body: JSON.stringify({ model:"gpt-4o-mini", input: prompt })
-  });
-  if(!res.ok){ throw new Error("OpenAI: "+res.status+" "+await res.text()); }
-  const j = await res.json();
-  // try to extract text
-  if(j.output_text) return j.output_text;
-  let out = "";
-  if(j.output && Array.isArray(j.output)){
-    j.output.forEach(o=>{ if(o.content) o.content.forEach(c=>{ if(c.text) out += c.text })});
-  }
-  return out || JSON.stringify(j);
-}
-
-/* Notifications and schedule */
-const ding = document.getElementById("ding");
-function requestNotifications(){
-  if(!("Notification" in window)) return alert("Уведомления не поддерживаются этим браузером");
-  Notification.requestPermission().then(p=>{
-    if(p==="granted"){ state.settings.notifications = true; saveState(); alert("Уведомления включены"); }
-  });
-}
-
-document.getElementById("notificationsToggle").addEventListener("change",(e)=>{
-  const on = e.target.checked;
-  state.settings.notifications = on;
-  saveState();
-  if(on) requestNotifications();
-});
-document.getElementById("soundToggle").addEventListener("change",(e)=>{ state.settings.sound = e.target.checked; saveState() });
-document.getElementById("dailyToggle").addEventListener("change",(e)=>{ state.settings.dailyDigest = e.target.checked; saveState() });
-
-/* scheduling: check every minute for due items */
-let schedulerInterval = null;
-function scheduleCheckerStart(){
-  if(schedulerInterval) clearInterval(schedulerInterval);
-  schedulerInterval = setInterval(()=> {
-    checkDueItems();
-  }, 30*1000); // каждые 30 сек
-}
-function checkDueItems(){
+/* interval checker for due items */
+setInterval(()=>{
   const now = new Date();
   state.tasks.forEach(t=>{
     if(t.done) return;
     if(!t.date || !t.time) return;
     if(t._notified) return;
-    const dt = new Date(t.date + "T" + (t.time || "00:00"));
-    if(Math.abs(dt - now) < 60*1000){ // within 1 minute
+    const dt = new Date(t.date + "T" + (t.time||"00:00"));
+    if(Math.abs(dt - now) < 60*1000){
       // notify
       if(state.settings.notifications && Notification.permission === "granted"){
-        new Notification("Напоминание: "+t.title, { body: (t.time?("в "+t.time):"") });
+        new Notification("Напоминание: " + t.title);
       }
-      if(state.settings.sound) ding.play();
-      t._notified = true;
-      saveState();
-      addMessage("assistant", `Напоминание: "${t.title}" — время пришло.`);
+      if(state.settings.sound) audioDing.play();
+      t._notified = true; saveState();
+      addToast("Напоминание: " + t.title);
     }
   });
-  // also events
-  state.events.forEach(ev=>{
-    if(ev._notified) return;
-    if(!ev.date || !ev.time) return;
-    const dt = new Date(ev.date + "T" + ev.time);
-    if(Math.abs(dt - new Date()) < 60*1000){
-      if(state.settings.notifications && Notification.permission === "granted"){
-        new Notification("Событие: "+ev.title, { body: ev.desc || "" });
-      }
-      if(state.settings.sound) ding.play();
-      ev._notified = true; saveState();
-    }
+}, 30*1000);
+
+/* simple toast */
+function addToast(txt){
+  const to = document.createElement("div"); to.innerText = txt; to.style.position="fixed"; to.style.right="16px"; to.style.bottom="24px"; to.style.padding="10px 12px"; to.style.background="linear-gradient(90deg,#7c5cff,#ff7ab6)"; to.style.borderRadius="10px"; to.style.boxShadow="0 8px 20px rgba(0,0,0,0.5);"; to.style.zIndex=99999;
+  document.body.appendChild(to); setTimeout(()=> to.style.opacity=0,2800); setTimeout(()=> to.remove(),3500);
+}
+
+/* tabs */
+els(".tab").forEach(t=>{
+  t.addEventListener("click", ()=> {
+    els(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const tab = t.dataset.tab;
+    els(".tab-pane").forEach(p=> p.style.display = "none");
+    el("#pane-"+tab).style.display = "";
   });
-}
-
-/* schedule notification for a new task */
-function scheduleNotificationForTask(task){
-  // if the date/time is soon, it will be picked up by checker
-}
-
-/* load/save on start */
-loadState(); render(); scheduleCheckerStart();
-
-/* initial examples */
-if(state.tasks.length===0 && state.events.length===0){
-  state.tasks.push({id:uid(), title:"Прочитать почту", date:(new Date()).toISOString().slice(0,10), time:"09:30", priority:"medium", done:false});
-  state.tasks.push({id:uid(), title:"Подготовить отчёт для команды", date:(new Date()).toISOString().slice(0,10), time:"15:00", priority:"high", done:false});
-  state.events.push({id:uid(), title:"Встреча с партнёром", date:(new Date()).toISOString().slice(0,10), time:"11:00", desc:"Zoom, обсудить стратегию"});
-  saveState(); render();
-}
-
-/* Settings button */
-document.getElementById("btnSettings").addEventListener("click", ()=> {
-  alert("Настройки:\n\n- Разреши уведомления (если нужно)\n- Вставь OpenAI ключ только если хочешь GPT-ответы с облака\n\nКлюч хранится локально в браузере.");
 });
 
-/* help / quicktips */
-addMessage("assistant", "Привет! Я встроенный помощник. Спроcи меня о задачах или напоминаниях. Чтобы использовать OpenAI, вставь ключ и нажми 'OpenAI (опция)'.");
+/* particles background */
+function initParticles(){
+  const wrap = el("#particles");
+  // create random 10 particles
+  for(let i=0;i<12;i++){
+    const p = document.createElement("div"); p.className="particle";
+    const size = Math.random()*40+20;
+    p.style.width = size+"px"; p.style.height = size+"px";
+    p.style.left = Math.random()*100+"%"; p.style.top = Math.random()*100+"%";
+    p.style.opacity = 0.08 + Math.random()*0.25;
+    p.style.transform = `translate(-50%,-50%)`;
+    wrap.appendChild(p);
+    // animate
+    (function(animP, idx){
+      setInterval(()=> {
+        animP.style.left = Math.random()*100+"%";
+        animP.style.top = Math.random()*100+"%";
+        animP.style.opacity = 0.05 + Math.random()*0.35;
+      }, 4000 + idx*300);
+    })(p,i);
+  }
+}
+initParticles();
+
+/* ===== initial load ===== */
+loadState(); seedData(); renderAll();
+
+/* ensure cowboy reacts when page visible and tasks added */
+document.addEventListener("visibilitychange", ()=> { if(!document.hidden) triggerCowboyRun("run"); });
+
+/* small helper to escape HTML */
+function escapeHtml(s){ if(!s) return ""; return s.replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+/* keyboard shortcuts for mobile (swipe) - left as optional */
 /* end script */
 </script>
-
 </body>
 </html>
