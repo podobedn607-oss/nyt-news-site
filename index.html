@@ -1,152 +1,555 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NYT → GPT — Новости и перевод</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DailyFlow — Ежедневник и помощник</title>
+
+<!-- Google font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --bg:#0f1724;
-  --card:#0b1220;
-  --accent:#ff6b6b;
-  --muted:#94a3b8;
-  --glass: rgba(255,255,255,0.04);
-  --shadow: rgba(2,8,23,0.6);
+  --bg:#0b1220; --card:#0f1724; --muted:#9fb0c8; --accent:#7c5cff;
+  --glass: rgba(255,255,255,0.04); --good:#10b981; --danger:#ff6b6b;
+  --text:#e6eef6; --shadow: 0 6px 30px rgba(2,6,23,0.6);
+  --radius:12px;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;font-family:Inter,Arial,sans-serif;height:100%;background:linear-gradient(180deg,#021428 0%,#07203a 40%,#091934 100%);color:#e6eef6;}
-.container{max-width:1200px;margin:24px auto;padding:24px}
-header{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.logo{font-weight:700;color:white;font-size:1.8rem;text-shadow:0 2px 8px rgba(0,0,0,0.5)}
-.top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-input[type="search"]{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:inherit;flex:1;min-width:180px}
-.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;transition:all 0.2s;}
-.btn.read{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:white}
-.btn.read:hover{opacity:0.85;transform:scale(1.03);}
-.btn.send{background:linear-gradient(90deg,#10b981,#06b6d4);color:white}
-.btn.send:hover{opacity:0.85;transform:scale(1.03);}
-.btn.reload{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--muted);}
-.btn.reload:hover{background:var(--glass);}
-.btn.more{background:var(--accent);color:white;margin-top:12px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 30px var(--shadow);border:1px solid rgba(255,255,255,0.03);transition:transform 0.3s,opacity 0.3s;opacity:0;transform:translateY(20px);}
-.card.visible{opacity:1;transform:translateY(0);}
-.thumb{height:160px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px}
-.title{font-weight:600;margin:0 0 8px 0}
-.meta{font-size:0.85rem;color:var(--muted);margin-bottom:10px}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-#articleView{margin-top:20px;padding:16px;border-radius:12px;background:var(--glass);min-height:160px;white-space:pre-wrap;overflow:auto;transition:all 0.3s;}
-.loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.author-label{position:fixed;left:16px;bottom:16px;font-size:0.95rem;color:white;font-weight:500;opacity:0.9;z-index:1000}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--text);background:
+  radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.12), transparent 8%),
+  linear-gradient(180deg,#041022 0%, #071829 60%, #081826 100%);}
+.app{max-width:1200px;margin:28px auto;padding:20px}
+.header{display:flex;align-items:center;gap:16px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ff7ab6);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;box-shadow:0 8px 30px rgba(124,92,255,0.18)}
+.h1{font-size:20px;margin:0}
+.h1 small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.tools{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:600;backdrop-filter: blur(4px)}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#ff7ab6);border:none;color:#fff}
+.search{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
+.layout{display:grid;grid-template-columns:360px 1fr 360px;gap:18px;margin-top:18px}
+.left, .right{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
+.center{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03);min-height:520px}
+.section-title{font-weight:700;margin:0 0 8px 0}
+.small{font-size:13px;color:var(--muted)}
+
+.card{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.02)}
+.todo-list{max-height:420px;overflow:auto;padding-right:6px}
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:8px}
+.check{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.check.checked{background:linear-gradient(90deg,var(--good),#38bdf8);border:none;color:white}
+.t-title{font-weight:600}
+.meta{font-size:12px;color:var(--muted);margin-top:6px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+
+.calendar{display:flex;flex-direction:column;gap:8px}
+.day-row{display:flex;gap:8px;align-items:center}
+.day{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+.day.active{background:linear-gradient(90deg,var(--accent),#ff7ab6);color:white}
+
+.event-card{padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));margin-bottom:8px}
+.event-title{font-weight:700}
+.event-time{font-size:13px;color:var(--muted)}
+
+.assistant{display:flex;flex-direction:column;height:520px}
+.assistant .messages{flex:1;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+.assistant .input{display:flex;gap:8px;padding-top:10px}
+.input textarea{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--text);min-height:56px}
+.small-muted{font-size:12px;color:var(--muted)}
+
+.footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+
+/* responsive */
+@media (max-width:1100px){
+  .layout{grid-template-columns:1fr; padding-bottom:80px}
+  .left,.right{order:2}
+  .center{order:1}
+}
 </style>
+
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="logo">NYT</div>
-  </header>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">DF</div>
+      <div>
+        <h1 class="h1">DailyFlow <small>Ежедневник, напоминания и веб-помощник</small></h1>
+      </div>
+    </div>
 
-  <div class="top-controls">
-    <input id="q" type="search" placeholder="Поиск по заголовкам...">
-    <button id="reload" class="btn btn.reload">Загрузить свежие статьи</button>
+    <div class="tools">
+      <input id="search" class="search" placeholder="Поиск задач, событий..." />
+      <button id="btnAddTask" class="btn">+ Новая задача</button>
+      <button id="btnAddEvent" class="btn">+ Событие</button>
+      <button id="btnSettings" class="btn">⚙ Настройки</button>
+    </div>
   </div>
 
-  <section id="list" class="grid"></section>
-  <button id="more" class="btn btn.more">Загрузить ещё</button>
-  <div id="articleView"></div>
+  <div class="layout">
+    <!-- LEFT: Контекст / Today / Tasks -->
+    <div class="left">
+      <div class="card">
+        <div class="section-title">Сегодня</div>
+        <div id="todayDate" class="small muted small-muted"></div>
+        <div id="digest" class="meta" style="margin-top:10px">Ежедневный дайджест: пока пусто</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Задачи</div>
+        <div class="small">Список задач — отмечай как выполненное</div>
+        <div class="todo-list" id="todoList" style="margin-top:10px"></div>
+        <div style="margin-top:8px" class="controls">
+          <button id="btnExport" class="btn">Экспорт</button>
+          <button id="btnImport" class="btn">Импорт</button>
+          <button id="btnClear" class="btn">Очистить</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Календарь (выбери дату)</div>
+        <div id="calendar" class="calendar"></div>
+      </div>
+    </div>
+
+    <!-- CENTER: Основной поток / список событий / редактор -->
+    <div class="center">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h2 style="margin:0">План на день</h2>
+        <div class="small-muted">Сортировка <select id="sortSel" style="background:transparent;color:var(--text);border:none">
+          <option value="time">по времени</option>
+          <option value="priority">по приоритету</option>
+        </select></div>
+      </div>
+
+      <div id="eventsFeed" style="margin-top:12px"></div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="section-title">Добавить задачу / событие</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <input id="taskTitle" placeholder="Название задачи" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+          <select id="priority" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+          <input id="dueDate" type="date" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+          <input id="dueTime" type="time" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+          <button id="addTaskBtn" class="btn primary">Добавить</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Assistant / settings -->
+    <div class="right">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="section-title">Веб-помощник</div>
+          <div class="small-muted">Встроенный ассистент — ответы локально + опция OpenAI</div>
+        </div>
+        <button id="clearChat" class="btn">🧹</button>
+      </div>
+
+      <div class="assistant card" style="margin-top:10px">
+        <div class="messages" id="messages"></div>
+        <div class="input">
+          <textarea id="assistantInput" placeholder="Спроси помощника: где мой дедлайн? как настроить уведомления?"></textarea>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button id="sendMsg" class="btn primary">Отправить</button>
+            <button id="useOpenAI" class="btn">OpenAI (опция)</button>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="small-muted">OpenAI ключ: <input id="openaiKey" placeholder="sk-..." style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" /></div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <div class="section-title">Настройки</div>
+        <div style="margin-top:8px" class="small-muted">
+          <label><input id="notificationsToggle" type="checkbox" /> Включить браузерные уведомления</label><br/>
+          <label><input id="soundToggle" type="checkbox" /> Звук при напоминании</label><br/>
+          <label><input id="dailyToggle" type="checkbox" /> Ежедневный дайджест (утром)</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">DailyFlow — делай больше, забывай меньше. © 2025</div>
 </div>
 
-<div class="author-label">Автор – Nikita Podobed | Техподдержка: +89854449930</div>
+<!-- Audio -->
+<audio id="ding" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="></audio>
 
 <script>
-const SERVER = "https://ВАШ_ПУБЛИЧНЫЙ_BACKEND"; // <-- замените на свой backend URL
-const listEl = document.getElementById("list");
-const articleView = document.getElementById("articleView");
-const q = document.getElementById("q");
-const reload = document.getElementById("reload");
-const more = document.getElementById("more");
-let articlesCache = [];
-let displayedCount = 0;
-const pageSize = 10;
+/* ========= Простой SPA логика ========= */
 
-async function fetchLatest(){
-  listEl.innerHTML='<div style="grid-column:1/-1;text-align:center"><span class="loader"></span> Загрузка...</div>';
-  try{
-    const res = await fetch(`${SERVER}/latest?count=50`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    articlesCache = data.items || [];
-    displayedCount = 0;
-    listEl.innerHTML = '';
-    renderNextPage();
-  }catch(e){
-    listEl.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:#ff8b8b">Ошибка загрузки: ${e.message}</div>`;
-  }
+/* STORAGE key */
+const STORAGE_KEY = "dailyflow_v1";
+
+/* state */
+let state = {
+  tasks: [], // {id,title,date,time,priority,done}
+  events: [], // {id,title,link,date,time,desc}
+  messages: [], // assistant messages
+  settings: { notifications: false, sound: true, dailyDigest: false, openaiKey: "" }
+};
+
+/* init */
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8) }
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ state = JSON.parse(raw); }
+  } catch(e){ console.error("loadState", e); }
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function formatDate(d){
+  const dt = new Date(d);
+  return dt.toLocaleDateString();
 }
 
-function renderNextPage(){
-  const nextItems = articlesCache.slice(displayedCount, displayedCount+pageSize);
-  nextItems.forEach((it,idx)=>{
-    const card = document.createElement("div");
-    card.className = "card";
-    const imgUrl = it.image||`https://source.unsplash.com/collection/928423/800x600?sig=${displayedCount+idx}`;
-    const thumb = document.createElement("div"); thumb.className="thumb"; thumb.style.backgroundImage=`url('${imgUrl}')`;
-    const title = document.createElement("h3"); title.className="title"; title.innerText=it.title;
-    const meta = document.createElement("div"); meta.className="meta"; meta.innerText=it.published||it.link;
-    const summary = document.createElement("div"); summary.style.marginBottom="10px"; summary.style.color="var(--muted)"; summary.innerHTML=it.summary||"";
-    const btns = document.createElement("div"); btns.className="btns";
-    const readBtn = document.createElement("button"); readBtn.className="btn read"; readBtn.innerText="Читать & Перевести"; readBtn.onclick=()=>loadArticle(it.link,true);
-    const sendBtn = document.createElement("button"); sendBtn.className="btn send"; sendBtn.innerText="Отправить боту"; sendBtn.onclick=()=>sendToBot(it.link);
-    btns.appendChild(readBtn); btns.appendChild(sendBtn);
-    card.appendChild(thumb); card.appendChild(title); card.appendChild(meta); card.appendChild(summary); card.appendChild(btns);
-    listEl.appendChild(card);
-    setTimeout(()=>card.classList.add('visible'), idx*100);
-  });
-  displayedCount += nextItems.length;
-  more.style.display = displayedCount >= articlesCache.length ? 'none' : 'inline-block';
-}
+/* Rendering */
+const todayDate = document.getElementById("todayDate");
+const todoList = document.getElementById("todoList");
+const eventsFeed = document.getElementById("eventsFeed");
+const calendar = document.getElementById("calendar");
+const digest = document.getElementById("digest");
+const messagesEl = document.getElementById("messages");
+const openaiKeyInput = document.getElementById("openaiKey");
 
-q.oninput = () => {
-  const term = q.value.trim().toLowerCase();
-  Array.from(listEl.children).forEach(card=>{
-    const t = card.querySelector('.title').innerText.toLowerCase();
-    card.style.display = t.includes(term) ? '' : 'none';
-  });
-}
+function render(){
+  // header date
+  const now = new Date();
+  todayDate.textContent = now.toLocaleString();
 
-async function loadArticle(url, scroll=true){
-  articleView.innerHTML="<div style='text-align:center'><span class='loader'></span> Получаем статью...</div>";
-  try{
-    const res = await fetch(`${SERVER}/get_article?url=${encodeURIComponent(url)}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if(json.error){articleView.innerHTML=`<div style="color:#ff8b8b">${json.error}</div>`; return;}
-    const html=`
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-weight:700">${json.link}</div>
-        <div><button class="btn send" onclick="sendToBot('${json.link.replaceAll("'", "\\'")}')">Отправить боту</button></div>
+  // todo list
+  todoList.innerHTML = "";
+  state.tasks.sort((a,b)=> (a.done - b.done) || (a.priority === b.priority ? 0 : (a.priority==="high"? -1:1)));
+  state.tasks.forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "todo-item";
+    div.innerHTML = `
+      <div class="check ${t.done ? "checked":""}" data-id="${t.id}">${t.done ? "✓":""}</div>
+      <div style="flex:1">
+        <div class="t-title">${escapeHtml(t.title)}</div>
+        <div class="meta">${t.date ? t.date : "без даты"} ${t.time ? "• "+t.time : ""} • ${t.priority}</div>
       </div>
-      <h2 style="margin-top:12px;margin-bottom:8px">${json.title||""}</h2>
-      <div style="color:var(--muted);margin-bottom:12px">Исходный текст:</div>
-      <div style="background:#081226;padding:12px;border-radius:8px;color:#dbeafe;max-height:380px;overflow:auto">${escapeHtml(json.text||"").replace(/\n/g,'<br>')}</div>
-      <div style="height:12px"></div>
-      <div style="color:var(--muted);margin-bottom:8px">Перевод (GPT):</div>
-      <div style="background:#021826;padding:12px;border-radius:8px;color:#dff6ea;white-space:pre-wrap">${escapeHtml(json.translation||"").replace(/\n/g,'<br>')}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" data-edit="${t.id}">✏</button>
+        <button class="btn" data-del="${t.id}">🗑</button>
+      </div>
     `;
-    articleView.innerHTML = html;
-    if(scroll) articleView.scrollIntoView({behavior:"smooth"});
-  }catch(e){articleView.innerHTML=`<div style="color:#ff8b8b">Ошибка: ${e.message}</div>`;}
+    todoList.appendChild(div);
+  });
+
+  // events feed (today)
+  eventsFeed.innerHTML = "";
+  const dayKey = (new Date()).toISOString().slice(0,10);
+  const todays = state.events.filter(e=> e.date === dayKey).sort((a,b)=> (a.time||"") < (b.time||"") ? -1:1);
+  if(todays.length===0){
+    eventsFeed.innerHTML = `<div class="small-muted">Сегодня нет событий</div>`;
+  }else{
+    todays.forEach(ev=>{
+      const el = document.createElement("div");
+      el.className = "event-card";
+      el.innerHTML = `<div class="event-title">${escapeHtml(ev.title)}</div>
+        <div class="event-time">${ev.time || "время не указано"}</div>
+        <div class="small" style="margin-top:8px">${escapeHtml(ev.desc || "")}</div>
+      `;
+      eventsFeed.appendChild(el);
+    });
+  }
+
+  // calendar: simple next 14 days
+  calendar.innerHTML = "";
+  const start = new Date();
+  for(let i=0;i<14;i++){
+    const d = new Date(start);
+    d.setDate(start.getDate()+i);
+    const key = d.toISOString().slice(0,10);
+    const count = state.events.filter(ev=>ev.date===key).length + state.tasks.filter(t=>t.date===key && !t.done).length;
+    const day = document.createElement("div");
+    day.className = "day-row";
+    day.innerHTML = `<div class="day ${i===0?'active':''}" data-date="${key}">${d.getDate()}</div>
+      <div style="font-size:13px;color:var(--muted)">${d.toLocaleDateString(undefined,{weekday:'short'})} ${count?(" • "+count):""}</div>`;
+    calendar.appendChild(day);
+  }
+
+  // digest summary (simple)
+  const upcoming = state.events.slice(0,3).map(e=>e.title).join(" • ");
+  digest.textContent = upcoming ? upcoming : "Пусто — добавьте задачи или события";
+
+  // assistant messages
+  messagesEl.innerHTML = "";
+  state.messages.forEach(m=>{
+    const mdiv = document.createElement("div");
+    mdiv.style.marginBottom = "8px";
+    mdiv.innerHTML = `<div style="font-size:12px;color:var(--muted)">${m.role}</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-top:4px">${escapeHtml(m.text)}</div>`;
+    messagesEl.appendChild(mdiv);
+  });
+
+  openaiKeyInput.value = state.settings.openaiKey || "";
 }
 
-function escapeHtml(u){if(!u) return ""; return u.replace(/[&<"'>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function sendToBot(url){if(window.Telegram && window.Telegram.WebApp){window.Telegram.WebApp.sendData(url);alert("Ссылка отправлена боту");}else{navigator.clipboard.writeText(url);alert("Telegram WebApp недоступен. Ссылка скопирована в буфер.");}}
+/* helpers */
+function escapeHtml(s){ if(!s) return ""; return s.replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
 
-reload.onclick = () => {articlesCache=[]; displayedCount=0; fetchLatest();}
-more.onclick = () => renderNextPage();
+/* Actions: add/edit/delete tasks/events */
+document.getElementById("addTaskBtn").addEventListener("click", ()=>{
+  const title = document.getElementById("taskTitle").value.trim();
+  if(!title){ alert("Введите название задачи"); return; }
+  const date = document.getElementById("dueDate").value || null;
+  const time = document.getElementById("dueTime").value || null;
+  const priority = document.getElementById("priority").value || "medium";
+  const newTask = { id: uid(), title, date, time, priority, done:false };
+  state.tasks.push(newTask);
+  saveState(); render(); scheduleNotificationForTask(newTask);
+  document.getElementById("taskTitle").value = "";
+});
 
-fetchLatest();
+document.getElementById("btnAddTask").addEventListener("click", ()=> document.getElementById("taskTitle").focus());
+document.getElementById("btnAddEvent").addEventListener("click", ()=> {
+  const title = prompt("Название события:");
+  if(!title) return;
+  const date = prompt("Дата (YYYY-MM-DD):", new Date().toISOString().slice(0,10));
+  const time = prompt("Время (HH:MM):", "");
+  const desc = prompt("Краткое описание:", "");
+  state.events.push({ id: uid(), title, date, time, desc });
+  saveState(); render();
+});
+
+/* delegated events for todo items */
+todoList.addEventListener("click", (ev)=>{
+  const ch = ev.target.closest(".check");
+  if(ch){
+    const id = ch.dataset.id;
+    const t = state.tasks.find(x=>x.id===id);
+    if(t){ t.done = !t.done; saveState(); render(); }
+  }
+  const del = ev.target.closest("[data-del]");
+  if(del){
+    const id = del.dataset.del;
+    state.tasks = state.tasks.filter(x=>x.id!==id);
+    saveState(); render();
+  }
+  const edit = ev.target.closest("[data-edit]");
+  if(edit){
+    const id = edit.dataset.edit;
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    const newTitle = prompt("Редактировать заголовок:", t.title);
+    if(newTitle !== null){ t.title = newTitle; saveState(); render(); }
+  }
+});
+
+/* import/export/clear */
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "dailyflow-export.json"; a.click();
+});
+document.getElementById("btnImport").addEventListener("click", ()=>{
+  const input = document.createElement("input"); input.type="file"; input.accept=".json";
+  input.onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try { const j = JSON.parse(r.result); state = j; saveState(); render(); alert("Импорт выполнен"); } catch(err){ alert("Ошибка импорта"); }
+    }
+    r.readAsText(f);
+  }
+  input.click();
+});
+document.getElementById("btnClear").addEventListener("click", ()=>{
+  if(confirm("Удалить все данные (локально)?")){ state = {tasks:[],events:[],messages:[],settings:state.settings}; saveState(); render(); }
+});
+
+/* search */
+document.getElementById("search").addEventListener("input", (e)=>{
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll(".t-title").forEach(el=> {
+    el.closest(".todo-item").style.display = el.innerText.toLowerCase().includes(q) ? "" : "none";
+  });
+});
+
+/* calendar click */
+calendar.addEventListener("click", (e)=>{
+  const d = e.target.closest(".day");
+  if(!d) return;
+  document.querySelectorAll(".day").forEach(x=>x.classList.remove("active"));
+  d.classList.add("active");
+  const date = d.dataset.date;
+  // show events for date
+  const list = state.events.filter(ev=>ev.date===date);
+  if(list.length===0){ alert("Событий на эту дату нет"); return; }
+  const txt = list.map(x=>`${x.time||''} ${x.title} — ${x.desc||''}`).join("\n\n");
+  alert("События:\n\n"+txt);
+});
+
+/* Assistant */
+document.getElementById("sendMsg").addEventListener("click", async ()=>{
+  const txt = document.getElementById("assistantInput").value.trim();
+  if(!txt) return;
+  addMessage("user", txt);
+  document.getElementById("assistantInput").value = "";
+  // simple local rules:
+  const lower = txt.toLowerCase();
+  if(lower.includes("сколько") && lower.includes("задач")){
+    const pending = state.tasks.filter(t=>!t.done).length;
+    addMessage("assistant", `У тебя ${pending} невыполненных задач.`);
+    return;
+  }
+  if(lower.includes("напомни") || lower.includes("поставь напоминание")){
+    addMessage("assistant", "Чтобы поставить напоминание, добавь задачу и укажи дату/время. Также можно включить браузерные уведомления в настройках.");
+    return;
+  }
+
+  // if openai key present and user wants it
+  const useOpenAI = document.getElementById("useOpenAI").clickedTimes || false;
+  const key = state.settings.openaiKey || openaiKeyInput.value.trim();
+  if(key && (lower.includes("объясни") || lower.includes("переведи") || document.getElementById("useOpenAI").dataset.forced==="1")){
+    // call OpenAI
+    addMessage("assistant", "Запрос к OpenAI выполняется...");
+    try {
+      const resp = await callOpenAI(key, txt);
+      addMessage("assistant", resp || "[OpenAI вернул пустой ответ]");
+    } catch(e){
+      addMessage("assistant", "[Ошибка OpenAI] "+e.message);
+    }
+  } else {
+    // fallback: echo + suggestion
+    addMessage("assistant", "Я локальный помощник: могу подсчитать задачи, подсказать как ставить напоминания и отправить события в бот. Попробуй: «Сколько задач у меня» или «Напомни мне завтра 10:00 позвонить».");
+  }
+});
+
+document.getElementById("useOpenAI").addEventListener("click", ()=>{
+  // mark that user wants to use OpenAI on next query
+  document.getElementById("useOpenAI").dataset.forced = "1";
+  document.getElementById("assistantInput").focus();
+});
+openaiKeyInput.addEventListener("change", ()=>{
+  state.settings.openaiKey = openaiKeyInput.value.trim();
+  saveState();
+});
+
+/* assistant message helpers */
+function addMessage(role, text){
+  state.messages.push({ id: uid(), role, text, ts: Date.now() });
+  saveState(); render();
+  // scroll messages
+  setTimeout(()=> messagesEl.scrollTop = messagesEl.scrollHeight, 50);
+}
+
+/* OpenAI call (optional) */
+async function callOpenAI(key, prompt){
+  // note: this uses the Responses endpoint; may need adjustment
+  const res = await fetch("https://api.openai.com/v1/responses", {
+    method:"POST",
+    headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
+    body: JSON.stringify({ model:"gpt-4o-mini", input: prompt })
+  });
+  if(!res.ok){ throw new Error("OpenAI: "+res.status+" "+await res.text()); }
+  const j = await res.json();
+  // try to extract text
+  if(j.output_text) return j.output_text;
+  let out = "";
+  if(j.output && Array.isArray(j.output)){
+    j.output.forEach(o=>{ if(o.content) o.content.forEach(c=>{ if(c.text) out += c.text })});
+  }
+  return out || JSON.stringify(j);
+}
+
+/* Notifications and schedule */
+const ding = document.getElementById("ding");
+function requestNotifications(){
+  if(!("Notification" in window)) return alert("Уведомления не поддерживаются этим браузером");
+  Notification.requestPermission().then(p=>{
+    if(p==="granted"){ state.settings.notifications = true; saveState(); alert("Уведомления включены"); }
+  });
+}
+
+document.getElementById("notificationsToggle").addEventListener("change",(e)=>{
+  const on = e.target.checked;
+  state.settings.notifications = on;
+  saveState();
+  if(on) requestNotifications();
+});
+document.getElementById("soundToggle").addEventListener("change",(e)=>{ state.settings.sound = e.target.checked; saveState() });
+document.getElementById("dailyToggle").addEventListener("change",(e)=>{ state.settings.dailyDigest = e.target.checked; saveState() });
+
+/* scheduling: check every minute for due items */
+let schedulerInterval = null;
+function scheduleCheckerStart(){
+  if(schedulerInterval) clearInterval(schedulerInterval);
+  schedulerInterval = setInterval(()=> {
+    checkDueItems();
+  }, 30*1000); // каждые 30 сек
+}
+function checkDueItems(){
+  const now = new Date();
+  state.tasks.forEach(t=>{
+    if(t.done) return;
+    if(!t.date || !t.time) return;
+    if(t._notified) return;
+    const dt = new Date(t.date + "T" + (t.time || "00:00"));
+    if(Math.abs(dt - now) < 60*1000){ // within 1 minute
+      // notify
+      if(state.settings.notifications && Notification.permission === "granted"){
+        new Notification("Напоминание: "+t.title, { body: (t.time?("в "+t.time):"") });
+      }
+      if(state.settings.sound) ding.play();
+      t._notified = true;
+      saveState();
+      addMessage("assistant", `Напоминание: "${t.title}" — время пришло.`);
+    }
+  });
+  // also events
+  state.events.forEach(ev=>{
+    if(ev._notified) return;
+    if(!ev.date || !ev.time) return;
+    const dt = new Date(ev.date + "T" + ev.time);
+    if(Math.abs(dt - new Date()) < 60*1000){
+      if(state.settings.notifications && Notification.permission === "granted"){
+        new Notification("Событие: "+ev.title, { body: ev.desc || "" });
+      }
+      if(state.settings.sound) ding.play();
+      ev._notified = true; saveState();
+    }
+  });
+}
+
+/* schedule notification for a new task */
+function scheduleNotificationForTask(task){
+  // if the date/time is soon, it will be picked up by checker
+}
+
+/* load/save on start */
+loadState(); render(); scheduleCheckerStart();
+
+/* initial examples */
+if(state.tasks.length===0 && state.events.length===0){
+  state.tasks.push({id:uid(), title:"Прочитать почту", date:(new Date()).toISOString().slice(0,10), time:"09:30", priority:"medium", done:false});
+  state.tasks.push({id:uid(), title:"Подготовить отчёт для команды", date:(new Date()).toISOString().slice(0,10), time:"15:00", priority:"high", done:false});
+  state.events.push({id:uid(), title:"Встреча с партнёром", date:(new Date()).toISOString().slice(0,10), time:"11:00", desc:"Zoom, обсудить стратегию"});
+  saveState(); render();
+}
+
+/* Settings button */
+document.getElementById("btnSettings").addEventListener("click", ()=> {
+  alert("Настройки:\n\n- Разреши уведомления (если нужно)\n- Вставь OpenAI ключ только если хочешь GPT-ответы с облака\n\nКлюч хранится локально в браузере.");
+});
+
+/* help / quicktips */
+addMessage("assistant", "Привет! Я встроенный помощник. Спроcи меня о задачах или напоминаниях. Чтобы использовать OpenAI, вставь ключ и нажми 'OpenAI (опция)'.");
+/* end script */
 </script>
+
 </body>
 </html>
