@@ -13,7 +13,7 @@
       overflow-x: hidden;
     }
 
-    /* 🌵 Анимация неба */
+    /* 🌌 Атмосфера */
     .sky {
       position: fixed;
       width: 100%;
@@ -27,7 +27,6 @@
       100% { background: radial-gradient(circle at 50% 20%, #3b0a45, #0d0d2b); }
     }
 
-    /* 🌬 Облака */
     .cloud {
       position: absolute;
       top: 20%;
@@ -58,7 +57,6 @@
       gap: 15px;
       margin-bottom: 20px;
     }
-
     nav button {
       background: #663300;
       border: 3px solid #331a00;
@@ -75,11 +73,9 @@
       transform: scale(1.1);
     }
 
-    main {
-      padding: 10px;
-    }
+    main { padding: 10px; }
 
-    /* 🎨 Карточки задач */
+    /* 📝 Задачи */
     .task-card {
       background: #331a00;
       border: 2px solid #ffcc66;
@@ -90,11 +86,7 @@
       align-items: center;
       justify-content: space-between;
     }
-
-    .task-card span {
-      font-size: 1.2rem;
-    }
-
+    .task-card span { font-size: 1.2rem; }
     .complete-btn {
       background: #006600;
       border: none;
@@ -103,6 +95,16 @@
       padding: 8px 12px;
       border-radius: 8px;
       cursor: pointer;
+    }
+    .delete-btn {
+      background: #990000;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 8px;
     }
 
     /* 🤠 Ковбой */
@@ -118,9 +120,7 @@
       0% { transform: translateY(0); }
       100% { transform: translateY(-5px); }
     }
-    .cowboy.happy img {
-      animation: cowboyHappy 1s ease-in-out 2;
-    }
+    .cowboy.happy img { animation: cowboyHappy 1s ease-in-out 2; }
     @keyframes cowboyHappy {
       0% { transform: rotate(0); }
       50% { transform: rotate(-15deg) translateY(-10px); }
@@ -128,22 +128,21 @@
     }
 
     /* 🎡 Колесо */
+    .wheel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     .wheel {
       margin: 20px auto;
-      width: 200px;
-      height: 200px;
-      border: 6px solid #ffcc66;
+      width: 300px;
+      height: 300px;
+      border: 8px solid #ffcc66;
       border-radius: 50%;
-      background: conic-gradient(#ff6600 0 25%, #ffcc66 25% 50%, #ff0066 50% 75%, #00ccff 75% 100%);
-      animation: spin 0s linear;
+      background: conic-gradient(#ff6600, #ffcc66, #ff0066, #00ccff);
+      transition: transform 3s ease-out;
     }
-    .wheel.spin {
-      animation: spin 3s ease-out;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(1440deg); }
-    }
+    .wheel.spin { transform: rotate(1440deg); }
 
     .streak {
       text-align: center;
@@ -153,11 +152,12 @@
       text-shadow: 1px 1px 4px #000;
     }
 
-    /* 📱 Мобильная адаптация */
+    /* 📱 Адаптация */
     @media (max-width: 600px) {
       header { font-size: 1.5rem; }
       nav { flex-wrap: wrap; }
       .cowboy img { width: 120px; }
+      .wheel { width: 220px; height: 220px; }
     }
   </style>
 </head>
@@ -182,22 +182,19 @@
     <!-- 📝 Задачи -->
     <div id="tasks" class="screen">
       <h2>Мои задачи</h2>
-      <div class="task-card">
-        <span>Учёба: сделать домашку</span>
-        <button class="complete-btn" onclick="completeTask(this)">✔</button>
-      </div>
-      <div class="task-card">
-        <span>Проект: придумать идею</span>
-        <button class="complete-btn" onclick="completeTask(this)">✔</button>
-      </div>
+      <input type="text" id="taskInput" placeholder="Новая задача..." />
+      <button onclick="addTask()">Добавить</button>
+      <div id="taskList"></div>
     </div>
 
     <!-- 🎡 Колесо -->
     <div id="wheel" class="screen" style="display:none;">
       <h2>Какую задачу поймаем?</h2>
-      <div class="wheel" id="wheelEl"></div>
-      <button onclick="spinWheel()">Крутить 🎡</button>
-      <p id="wheelResult"></p>
+      <div class="wheel-container">
+        <div class="wheel" id="wheelEl"></div>
+        <button onclick="spinWheel()">Крутить 🎡</button>
+        <p id="wheelResult"></p>
+      </div>
     </div>
 
     <!-- 🔥 Огонёк -->
@@ -208,18 +205,65 @@
   </main>
 
   <script>
+    let tasks = [];
     let streak = 0;
+
+    // 🔥 streak по дням
+    const today = new Date().toDateString();
+    let lastVisit = localStorage.getItem("lastVisit");
+    let savedStreak = parseInt(localStorage.getItem("streak") || "0");
+
+    if (lastVisit === today) {
+      streak = savedStreak;
+    } else if (lastVisit === new Date(Date.now() - 86400000).toDateString()) {
+      streak = savedStreak + 1;
+    } else {
+      streak = 1;
+    }
+    localStorage.setItem("lastVisit", today);
+    localStorage.setItem("streak", streak);
+    document.getElementById("streakCount").innerText = "🔥 " + streak;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
       document.getElementById(id).style.display = 'block';
     }
 
-    function completeTask(btn) {
-      btn.parentElement.style.opacity = "0.5";
-      streak++;
-      document.getElementById("streakCount").innerText = "🔥 " + streak;
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const taskText = input.value.trim();
+      if (taskText === "") return;
+      tasks.push(taskText);
+      renderTasks();
+      input.value = "";
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const div = document.createElement("div");
+        div.className = "task-card";
+        div.innerHTML = `
+          <span>${task}</span>
+          <div>
+            <button class="complete-btn" onclick="completeTask(${index})">✔</button>
+            <button class="delete-btn" onclick="deleteTask(${index})">✖</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function completeTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
       cowboyCelebrate();
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
     }
 
     function cowboyCelebrate() {
@@ -229,12 +273,17 @@
     }
 
     function spinWheel() {
+      if (tasks.length === 0) {
+        document.getElementById("wheelResult").innerText = "Нет задач для выбора!";
+        return;
+      }
       const wheel = document.getElementById("wheelEl");
       wheel.classList.add("spin");
       setTimeout(() => {
         wheel.classList.remove("spin");
+        const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
         document.getElementById("wheelResult").innerText =
-          "Ковбой выбрал задачу: «Учёба» 🎓";
+          "Ковбой выбрал задачу: «" + randomTask + "» 🤠";
       }, 3000);
     }
   </script>
